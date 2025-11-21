@@ -1,0 +1,12 @@
+levelupgamer_high = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=g3f1f66672d9283_levelupgamer_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+levelupgamer_low = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=g3f1f66672d9283_levelupgamer_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+levelupgamer_medium = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=g3f1f66672d9283_levelupgamer_medium.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+levelupgamer_tp = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=g3f1f66672d9283_levelupgamer_tp.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+levelupgamer_tpurgent = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=g3f1f66672d9283_levelupgamer_tpurgent.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+
+
