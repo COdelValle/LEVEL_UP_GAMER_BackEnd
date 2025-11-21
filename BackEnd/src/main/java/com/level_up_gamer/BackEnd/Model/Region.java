@@ -9,7 +9,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "regiones")
+@Table(name = "region")
 public class Region {
     
     @Id

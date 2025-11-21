@@ -10,7 +10,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "categorias")
+@Table(name = "categoria")
 public class CategoriaProducto {
     
     @Id
@@ -23,7 +23,7 @@ public class CategoriaProducto {
     @Column(nullable = false, unique = true)
     private String slug;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "VARCHAR2(500)")
     private String descripcion;
     
     @Column(nullable = true)

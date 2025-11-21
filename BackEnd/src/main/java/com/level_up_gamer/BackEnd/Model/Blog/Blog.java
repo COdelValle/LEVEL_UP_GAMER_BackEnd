@@ -11,7 +11,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "articulos_blog")
+@Table(name = "blog")
 public class Blog {
     
     @Id
@@ -21,10 +21,12 @@ public class Blog {
     @Column(nullable = false)
     private String title;
     
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Lob
+    @Column(nullable = false, columnDefinition = "CLOB")
     private String excerpt;
     
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Lob
+    @Column(nullable = false, columnDefinition = "CLOB")
     private String content;
     
     @Column(nullable = false)

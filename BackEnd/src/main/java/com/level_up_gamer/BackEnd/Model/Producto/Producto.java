@@ -7,7 +7,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "productos")
+@Table(name = "producto")
 public class Producto {
     
     @Id
@@ -23,10 +23,11 @@ public class Producto {
     @Column(nullable = false)
     private String categoria;
     
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Lob
+    @Column(nullable = false, columnDefinition = "CLOB")
     private String imagen;
     
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "VARCHAR(1000)")
     private String descripcion;
     
     @Column(nullable = false)
@@ -44,6 +45,7 @@ public class Producto {
     @Column(nullable = true)
     private Integer precioOferta;
     
-    @Column(columnDefinition = "JSON")
+    @Lob
+    @Column(columnDefinition = "CLOB CHECK (especificaciones IS JSON)")
     private String especificaciones;
 }

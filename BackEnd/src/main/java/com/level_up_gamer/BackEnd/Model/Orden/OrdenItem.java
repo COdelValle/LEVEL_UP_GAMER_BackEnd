@@ -9,7 +9,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "orden_items")
+@Table(name = "orden_item")
 public class OrdenItem {
     
     @Id

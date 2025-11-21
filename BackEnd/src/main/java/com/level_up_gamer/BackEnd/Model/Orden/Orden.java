@@ -12,7 +12,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "ordenes")
+@Table(name = "orden")
 public class Orden {
     
     @Id
