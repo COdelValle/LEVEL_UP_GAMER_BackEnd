@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.level_up_gamer.BackEnd.DTO.AuthResponse;
-import com.level_up_gamer.BackEnd.DTO.LoginRequest;
-import com.level_up_gamer.BackEnd.DTO.RegisterRequest;
+import com.level_up_gamer.BackEnd.DTO.Auth.AuthResponse;
+import com.level_up_gamer.BackEnd.DTO.Auth.LoginRequest;
+import com.level_up_gamer.BackEnd.DTO.Auth.RegisterRequest;
 import com.level_up_gamer.BackEnd.Model.Usuario.Usuario;
 import com.level_up_gamer.BackEnd.Repository.UsuarioRepository;
 import com.level_up_gamer.BackEnd.Security.JwtProvider;

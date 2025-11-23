@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.level_up_gamer.BackEnd.Model.Usuario.Usuario;
-import com.level_up_gamer.BackEnd.DTO.*;
+import com.level_up_gamer.BackEnd.DTO.Usuario.UpdateUsuarioRequest;
 import com.level_up_gamer.BackEnd.Service.UsuarioService;
 
 import java.util.HashMap;
