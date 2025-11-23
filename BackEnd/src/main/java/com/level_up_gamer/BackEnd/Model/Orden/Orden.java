@@ -41,7 +41,7 @@ public class Orden {
     private MetodoPago metodoPago;
     
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "orden_id")
+    @JoinColumn(name = "orden_id", nullable = false)
     private List<OrdenItem> items;
     
     @Embedded
