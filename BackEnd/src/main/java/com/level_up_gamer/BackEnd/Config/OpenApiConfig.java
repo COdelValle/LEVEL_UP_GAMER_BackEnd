@@ -2,7 +2,6 @@ package com.level_up_gamer.BackEnd.Config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -38,14 +37,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("LEVEL UP GAMER API")
                         .version("1.0.0")
-                        .description("API Backend para la plataforma de gaming LEVEL UP GAMER. " +
-                                "Incluye autenticación segura con JWT, gestión de usuarios, " +
-                                "catálogo de productos, procesamiento de órdenes y blog de contenido.")
-                        .contact(new Contact()
-                                .name("LEVEL UP GAMER Development Team")
-                                .email("dev@levelupgamer.com")
-                                .url("https://www.levelupgamer.com")
-                        )
+                        .description("API Backend para la plataforma de gaming LEVEL UP GAMER")
                 )
                 
                 // Servidores de desarrollo y producción

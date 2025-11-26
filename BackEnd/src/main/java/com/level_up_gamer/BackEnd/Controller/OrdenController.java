@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/ordenes")
+@RequestMapping("/api/v1/ordenes")
 @Tag(name = "Órdenes", description = "API para gestión de órdenes de compra")
 @SecurityRequirement(name = "bearerAuth")
 @SecurityRequirement(name = "apiKeyAuth")

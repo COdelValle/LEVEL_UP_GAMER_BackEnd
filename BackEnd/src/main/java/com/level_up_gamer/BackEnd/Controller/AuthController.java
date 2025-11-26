@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Autenticación", description = "API para registro, login y gestión de autenticación")
 public class AuthController {

@@ -9,6 +9,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * DTO para actualizar información del usuario
  * Usado en: PUT /api/usuarios/{id}
+ * 
+ * Campos opcionales:
+ * - nombre: actualizar nombre completo
+ * - email: cambiar email (debe ser único)
+ * - password: cambiar contraseña (requiere passwordConfirm)
+ * - passwordConfirm: confirmación de nueva contraseña
+ * - rol: cambiar rol (solo ADMIN puede hacer esto)
  */
 @Data
 @AllArgsConstructor
@@ -16,14 +23,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Solicitud para actualizar información del usuario")
 public class UpdateUsuarioRequest {
     
-    @NotBlank(message = "El nombre es requerido")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
-    @Schema(description = "Nombre completo del usuario", example = "Juan Pérez")
+    @Schema(description = "Nombre completo del usuario (opcional)", example = "Juan Pérez")
     private String nombre;
     
-    @Schema(description = "Teléfono de contacto", example = "+56912345678")
-    private String telefono;
+    @Email(message = "El email debe ser válido")
+    @Schema(description = "Correo electrónico nuevo (debe ser único y válido)", example = "nuevo@example.com")
+    private String email;
     
-    @Schema(description = "Dirección residencial", example = "Calle Principal 123, Apto 4B")
-    private String direccion;
+    @Size(min = 6, max = 100, message = "La contraseña debe tener entre 6 y 100 caracteres")
+    @Schema(description = "Nueva contraseña (mínimo 6 caracteres). Si se proporciona, passwordConfirm es obligatorio", example = "NuevaPassword123!")
+    private String password;
+    
+    @Schema(description = "Confirmación de la nueva contraseña (debe coincidir exactamente con password)", example = "NuevaPassword123!")
+    private String passwordConfirm;
+    
+    @Schema(description = "Rol del usuario en el sistema. Solo ADMIN puede cambiar roles. Valores: USER, ADMIN, SELLER, GUEST", example = "ADMIN")
+    private String rol;
 }

@@ -1,0 +1,617 @@
+{
+  "info": {
+    "_postman_id": "level-up-gamer-backend",
+    "name": "LEVEL UP GAMER - Backend API",
+    "description": "Colección completa de endpoints para la API Backend de LEVEL UP GAMER\n\n## Base URL\n```\nhttp://localhost:8080\n```\n\n## Autenticación\nLa mayoría de endpoints requieren un JWT Token. Después de hacer login o registro, copia el token y úsalo en el header:\n```\nAuthorization: Bearer <TOKEN>\n```\n\n## Roles disponibles\n- USER: Usuario básico\n- ADMIN: Administrador del sistema\n- SELLER: Vendedor de productos\n- EDITOR: Editor de contenido de blog",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticación",
+      "description": "Endpoints para registro, login y validación de tokens JWT",
+      "item": [
+        {
+          "name": "1. Registrar nuevo usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"Password123!\",\n  \"passwordConfirm\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "Registra un nuevo usuario. No requiere autenticación.\n\n**Validaciones:**\n- nombre: 2-100 caracteres\n- email: formato válido y único\n- password: 6-100 caracteres\n- passwordConfirm: debe ser igual a password"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login (obtener token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Autentica un usuario y retorna un JWT Token válido por 24 horas.\n\n**Respuesta:**\n- token: JWT para usar en headers Authorization\n- apiKey: clave alternativa para máquina-máquina\n- usuarioId: ID del usuario\n- nombre, email, rol: información del usuario"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Validar token JWT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/validate",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "auth", "validate"]
+            },
+            "description": "Verifica si un JWT Token es válido sin consumir su ciclo de vida.\n\nReemplaza {{token}} con tu JWT actual."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👥 Usuarios",
+      "description": "Endpoints para gestión de usuarios",
+      "item": [
+        {
+          "name": "Obtener todos los usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/usuarios",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "usuarios"]
+            },
+            "description": "Obtiene la lista de todos los usuarios registrados.\n\n**Requiere:** Autenticación (cualquier usuario autenticado)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/usuarios/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "usuarios", "1"]
+            },
+            "description": "Obtiene los detalles de un usuario específico por su ID.\n\nCambia el 1 por el ID del usuario que quieras consultar."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener usuario por email",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/usuarios/email/juan@example.com",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "usuarios", "email", "juan@example.com"]
+            },
+            "description": "Obtiene los detalles de un usuario buscando por su email."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar usuario (nombre y/o rol)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Pérez Actualizado\",\n  \"email\": \"newemail@example.com\",\n  \"password\": \"NuevaPassword123!\",\n  \"passwordConfirm\": \"NuevaPassword123!\",\n  \"rol\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/usuarios/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "usuarios", "1"]
+            },
+            "description": "Actualiza los datos de un usuario. Todos los campos son opcionales.\n\nCambia el 1 por el ID del usuario a actualizar.\n\n**Campos actualizables:**\n- nombre: nuevo nombre (2-100 caracteres)\n- email: nuevo email (debe ser único)\n- password: nueva contraseña (6-100 caracteres, requiere passwordConfirm)\n- passwordConfirm: confirmación de contraseña (debe coincidir exactamente)\n- rol: nuevo rol (USER, ADMIN, SELLER, GUEST)\n\n**Nota:** Solo proporciona los campos que deseas actualizar."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/usuarios/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "usuarios", "1"]
+            },
+            "description": "Elimina un usuario del sistema.\n\nCambia el 1 por el ID del usuario a eliminar."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🎮 Productos",
+      "description": "Endpoints para gestión del catálogo de productos",
+      "item": [
+        {
+          "name": "Obtener todos los productos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/productos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "productos"]
+            },
+            "description": "Obtiene la lista de todos los productos disponibles.\n\n**Requiere:** Autenticación"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener producto por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/productos/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "productos", "1"]
+            },
+            "description": "Obtiene los detalles de un producto específico.\n\nCambia el 1 por el ID del producto."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear nuevo producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"PS5 Controller\",\n  \"precio\": 59.99,\n  \"categoria\": \"ACCESORIOS\",\n  \"stock\": 50,\n  \"descripcion\": \"Control inalámbrico para PlayStation 5\",\n  \"imagen\": \"https://example.com/ps5-controller.jpg\",\n  \"destacado\": true,\n  \"nuevo\": true\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/productos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "productos"]
+            },
+            "description": "Crea un nuevo producto en el catálogo.\n\n**Requiere:** Rol ADMIN o SELLER\n**Campos:**\n- nombre: nombre del producto\n- precio: precio en decimal\n- categoria: CONSOLAS, JUEGOS, ACCESORIOS, etc.\n- stock: cantidad disponible\n- descripcion: descripción del producto\n- imagen: URL de la imagen\n- destacado: boolean\n- nuevo: boolean"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"PS5 Controller - Actualizado\",\n  \"precio\": 64.99,\n  \"categoria\": \"ACCESORIOS\",\n  \"stock\": 45,\n  \"descripcion\": \"Control inalámbrico mejorado para PlayStation 5\",\n  \"imagen\": \"https://example.com/ps5-controller.jpg\",\n  \"destacado\": true,\n  \"nuevo\": false\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/productos/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "productos", "1"]
+            },
+            "description": "Actualiza los detalles de un producto existente.\n\n**Requiere:** Rol ADMIN o SELLER\n\nCambia el 1 por el ID del producto a actualizar."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar producto",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/productos/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "productos", "1"]
+            },
+            "description": "Elimina un producto del catálogo.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID del producto a eliminar."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📰 Blog",
+      "description": "Endpoints para gestión de artículos del blog",
+      "item": [
+        {
+          "name": "Obtener todos los artículos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog"]
+            },
+            "description": "Obtiene la lista de todos los artículos publicados en el blog.\n\n**Requiere:** Sin autenticación (público)"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener artículo por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog", "1"]
+            },
+            "description": "Obtiene el contenido completo de un artículo específico.\n\nCambia el 1 por el ID del artículo."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener artículos por autor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog/autor/Juan García",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog", "autor", "Juan García"]
+            },
+            "description": "Obtiene todos los artículos publicados por un autor específico.\n\nCambia 'Juan García' por el nombre del autor."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener artículos destacados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog/destacados",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog", "destacados"]
+            },
+            "description": "Obtiene los artículos destacados para mostrar en la portada.\n\n**Requiere:** Sin autenticación (público)"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear nuevo artículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Guía completa de PlayStation 5\",\n  \"excerpt\": \"Descubre las mejores características y juegos para PS5\",\n  \"content\": \"Este es el contenido completo del artículo. Debe tener al menos 100 caracteres y contiene toda la información detallada sobre PlayStation 5 y sus características únicas.\",\n  \"categoria\": \"Gaming\",\n  \"author\": \"Juan García\",\n  \"image\": \"https://example.com/ps5.jpg\",\n  \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog"]
+            },
+            "description": "Crea un nuevo artículo en el blog.\n\n**Requiere:** Rol ADMIN o EDITOR\n**Categorías disponibles:** Gaming, Reviews, Tutoriales, Noticias, Competitivo\n**Validaciones:**\n- title: 10-200 caracteres\n- excerpt: 50-500 caracteres\n- content: mínimo 100 caracteres"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar artículo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Guía completa de PlayStation 5 - Actualizada\",\n  \"excerpt\": \"Descubre las mejores características y juegos para PS5 (versión 2025)\",\n  \"content\": \"Contenido actualizado con nueva información sobre PS5 y sus características. Este es un texto más largo con al menos 100 caracteres para cumplir con la validación mínima requerida por el sistema.\",\n  \"categoria\": \"Gaming\",\n  \"image\": \"https://example.com/ps5-v2.jpg\",\n  \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog", "1"]
+            },
+            "description": "Actualiza un artículo existente.\n\n**Requiere:** Rol ADMIN o EDITOR\n\nCambia el 1 por el ID del artículo a actualizar."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar artículo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog", "1"]
+            },
+            "description": "Elimina un artículo del blog.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID del artículo a eliminar."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📦 Órdenes",
+      "description": "Endpoints para gestión de órdenes de compra",
+      "item": [
+        {
+          "name": "Obtener todas las órdenes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/ordenes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "ordenes"]
+            },
+            "description": "Obtiene la lista de todas las órdenes de compra.\n\n**Requiere:** Autenticación"
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener orden por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/ordenes/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "ordenes", "1"]
+            },
+            "description": "Obtiene los detalles de una orden específica.\n\nCambia el 1 por el ID de la orden."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear nueva orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 1,\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 2,\n      \"precio\": 59.99\n    }\n  ],\n  \"total\": 119.98,\n  \"estado\": \"PENDIENTE\",\n  \"metodoPago\": \"TARJETA_CREDITO\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/ordenes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "ordenes"]
+            },
+            "description": "Crea una nueva orden de compra.\n\n**Requiere:** Autenticación (cualquier usuario autenticado puede crear órdenes)"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar orden",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ENVIADA\",\n  \"metodoPago\": \"TARJETA_CREDITO\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/ordenes/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "ordenes", "1"]
+            },
+            "description": "Actualiza una orden existente.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID de la orden a actualizar."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar orden",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/ordenes/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "ordenes", "1"]
+            },
+            "description": "Elimina una orden.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID de la orden a eliminar."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT Token obtenido después del login. Cópia aquí tu token después de autenticarte."
+    }
+  ]
+}

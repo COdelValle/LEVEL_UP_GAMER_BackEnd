@@ -46,6 +46,11 @@ public class UsuarioService {
         return repository.save(o);
     }
 
+    // Encriptar contraseña:
+    public String encryptPassword(String password) {
+        return passwordEncrypter.encryptPassword(password);
+    }
+
     // Eliminar Usuario:
         // Por Objeto:
         public Boolean deleteUsuario(Usuario o){

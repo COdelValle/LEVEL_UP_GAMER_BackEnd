@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/api/v1/productos")
 @Tag(name = "Productos", description = "API para gestión del catálogo de productos")
 @SecurityRequirement(name = "bearerAuth")
 @SecurityRequirement(name = "apiKeyAuth")
