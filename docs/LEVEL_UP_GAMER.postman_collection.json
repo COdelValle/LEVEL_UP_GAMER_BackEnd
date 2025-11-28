@@ -22,7 +22,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"Password123!\",\n  \"passwordConfirm\": \"Password123!\"\n}"
+              "raw": "{\n  \"nombre\": \"Benjamin\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"password\": \"123456\",\n  \"passwordConfirm\": \"123456\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/auth/register",
@@ -47,7 +47,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"email\": \"benjamin@levelup.cl\",\n  \"password\": \"123456\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/auth/login",
@@ -140,18 +140,18 @@
               }
             ],
             "url": {
-              "raw": "http://localhost:8080/api/v1/usuarios/email/juan@example.com",
+              "raw": "http://localhost:8080/api/v1/usuarios/email/benjamin@levelup.cl",
               "protocol": "http",
               "host": ["localhost"],
               "port": "8080",
-              "path": ["api", "v1", "usuarios", "email", "juan@example.com"]
+              "path": ["api", "v1", "usuarios", "email", "benjamin@levelup.cl"]
             },
             "description": "Obtiene los detalles de un usuario buscando por su email."
           },
           "response": []
         },
         {
-          "name": "Actualizar usuario (nombre y/o rol)",
+          "name": "Actualizar usuario",
           "request": {
             "method": "PUT",
             "header": [
@@ -166,7 +166,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Juan Pérez Actualizado\",\n  \"email\": \"newemail@example.com\",\n  \"password\": \"NuevaPassword123!\",\n  \"passwordConfirm\": \"NuevaPassword123!\",\n  \"rol\": \"ADMIN\"\n}"
+              "raw": "{\n  \"nombre\": \"Benjamin García\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"rol\": \"USER\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/usuarios/1",
@@ -175,7 +175,36 @@
               "port": "8080",
               "path": ["api", "v1", "usuarios", "1"]
             },
-            "description": "Actualiza los datos de un usuario. Todos los campos son opcionales.\n\nCambia el 1 por el ID del usuario a actualizar.\n\n**Campos actualizables:**\n- nombre: nuevo nombre (2-100 caracteres)\n- email: nuevo email (debe ser único)\n- password: nueva contraseña (6-100 caracteres, requiere passwordConfirm)\n- passwordConfirm: confirmación de contraseña (debe coincidir exactamente)\n- rol: nuevo rol (USER, ADMIN, SELLER, GUEST)\n\n**Nota:** Solo proporciona los campos que deseas actualizar."
+            "description": "Actualiza los datos de un usuario. Todos los campos son opcionales.\n\nCambia el 1 por el ID del usuario a actualizar."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear múltiples usuarios (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"nombre\": \"Juan García\",\n    \"email\": \"juan@levelup.cl\",\n    \"password\": \"123456\",\n    \"apiKey\": \"api-key-juan\",\n    \"rol\": \"USER\"\n  },\n  {\n    \"nombre\": \"María López\",\n    \"email\": \"maria@levelup.cl\",\n    \"password\": \"123456\",\n    \"apiKey\": \"api-key-maria\",\n    \"rol\": \"SELLER\"\n  }\n]"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/usuarios/bulk",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "usuarios", "bulk"]
+            },
+            "description": "Crea múltiples usuarios en una sola solicitud.\n\n**Requiere:** Rol ADMIN"
           },
           "response": []
         },
@@ -264,7 +293,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"PS5 Controller\",\n  \"precio\": 59.99,\n  \"categoria\": \"ACCESORIOS\",\n  \"stock\": 50,\n  \"descripcion\": \"Control inalámbrico para PlayStation 5\",\n  \"imagen\": \"https://example.com/ps5-controller.jpg\",\n  \"destacado\": true,\n  \"nuevo\": true\n}"
+              "raw": "{\n  \"nombre\": \"PlayStation 5\",\n  \"precio\": 699990,\n  \"categoria\": \"consolas\",\n  \"stock\": 15,\n  \"descripcion\": \"La última consola de Sony con tecnología de vanguardia\",\n  \"imagen\": \"https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=400&fit=crop\",\n  \"destacado\": true,\n  \"nuevo\": false\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/productos",
@@ -273,7 +302,36 @@
               "port": "8080",
               "path": ["api", "v1", "productos"]
             },
-            "description": "Crea un nuevo producto en el catálogo.\n\n**Requiere:** Rol ADMIN o SELLER\n**Campos:**\n- nombre: nombre del producto\n- precio: precio en decimal\n- categoria: CONSOLAS, JUEGOS, ACCESORIOS, etc.\n- stock: cantidad disponible\n- descripcion: descripción del producto\n- imagen: URL de la imagen\n- destacado: boolean\n- nuevo: boolean"
+            "description": "Crea un nuevo producto en el catálogo.\n\n**Requiere:** Rol ADMIN o SELLER"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear múltiples productos (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"nombre\": \"PlayStation 5\",\n    \"precio\": 699990,\n    \"categoria\": \"consolas\",\n    \"stock\": 15,\n    \"descripcion\": \"La última consola de Sony con tecnología de vanguardia\",\n    \"imagen\": \"https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=400&fit=crop\",\n    \"destacado\": true,\n    \"nuevo\": false\n  },\n  {\n    \"nombre\": \"Xbox Series X\",\n    \"precio\": 599990,\n    \"categoria\": \"consolas\",\n    \"stock\": 12,\n    \"descripcion\": \"Consola de nueva generación de Microsoft\",\n    \"imagen\": \"https://images.unsplash.com/photo-1605559424843-9e4c3a1b2d2f?w=600&h=400&fit=crop\",\n    \"destacado\": true,\n    \"nuevo\": true\n  },\n  {\n    \"nombre\": \"Nintendo Switch OLED\",\n    \"precio\": 449990,\n    \"categoria\": \"consolas\",\n    \"stock\": 20,\n    \"descripcion\": \"Consola híbrida con pantalla OLED mejorada\",\n    \"imagen\": \"https://images.unsplash.com/photo-1580522157550-7323278949f5?w=600&h=400&fit=crop\",\n    \"destacado\": false,\n    \"nuevo\": false\n  }\n]"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/productos/bulk",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "productos", "bulk"]
+            },
+            "description": "Crea múltiples productos en una sola solicitud.\n\n**Requiere:** Rol ADMIN"
           },
           "response": []
         },
@@ -293,7 +351,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"PS5 Controller - Actualizado\",\n  \"precio\": 64.99,\n  \"categoria\": \"ACCESORIOS\",\n  \"stock\": 45,\n  \"descripcion\": \"Control inalámbrico mejorado para PlayStation 5\",\n  \"imagen\": \"https://example.com/ps5-controller.jpg\",\n  \"destacado\": true,\n  \"nuevo\": false\n}"
+              "raw": "{\n  \"nombre\": \"PlayStation 5 - Edición Standard\",\n  \"precio\": 699990,\n  \"categoria\": \"consolas\",\n  \"stock\": 20,\n  \"descripcion\": \"La última consola de Sony con tecnología de vanguardia - Edición Standard\",\n  \"imagen\": \"https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=400&fit=crop\",\n  \"destacado\": true,\n  \"nuevo\": false\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/productos/1",
@@ -302,7 +360,7 @@
               "port": "8080",
               "path": ["api", "v1", "productos", "1"]
             },
-            "description": "Actualiza los detalles de un producto existente.\n\n**Requiere:** Rol ADMIN o SELLER\n\nCambia el 1 por el ID del producto a actualizar."
+            "description": "Actualiza los detalles de un producto existente.\n\n**Requiere:** Rol ADMIN o SELLER"
           },
           "response": []
         },
@@ -323,7 +381,7 @@
               "port": "8080",
               "path": ["api", "v1", "productos", "1"]
             },
-            "description": "Elimina un producto del catálogo.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID del producto a eliminar."
+            "description": "Elimina un producto del catálogo.\n\n**Requiere:** Rol ADMIN"
           },
           "response": []
         }
@@ -371,13 +429,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/blog/autor/Juan García",
+              "raw": "http://localhost:8080/api/v1/blog/autor/Level-Up%20Gamer%20Team",
               "protocol": "http",
               "host": ["localhost"],
               "port": "8080",
-              "path": ["api", "v1", "blog", "autor", "Juan García"]
+              "path": ["api", "v1", "blog", "autor", "Level-Up Gamer Team"]
             },
-            "description": "Obtiene todos los artículos publicados por un autor específico.\n\nCambia 'Juan García' por el nombre del autor."
+            "description": "Obtiene todos los artículos publicados por un autor específico.\n\nCambia 'Level-Up Gamer Team' por el nombre del autor."
           },
           "response": []
         },
@@ -413,7 +471,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Guía completa de PlayStation 5\",\n  \"excerpt\": \"Descubre las mejores características y juegos para PS5\",\n  \"content\": \"Este es el contenido completo del artículo. Debe tener al menos 100 caracteres y contiene toda la información detallada sobre PlayStation 5 y sus características únicas.\",\n  \"categoria\": \"Gaming\",\n  \"author\": \"Juan García\",\n  \"image\": \"https://example.com/ps5.jpg\",\n  \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n}"
+              "raw": "{\n  \"title\": \"Cómo Armar el Setup Gamer Perfecto en 2025\",\n  \"excerpt\": \"Descubre los componentes esenciales para crear tu estación de juego ideal con ergonomía, rendimiento y estilo.\",\n  \"content\": \"<h2>La Guía Definitiva para tu Setup Gaming</h2><p>En 2025, tener el setup perfecto es más importante que nunca. Te guiaremos a través de cada componente esencial: monitor de alta tasa de refresco, mouse y teclado gaming profesionales, silla ergonómica, iluminación ambiente y accesorios complementarios.</p><p>Aprenderás a balancear presupuesto y calidad para obtener el máximo rendimiento en tus juegos favoritos.</p>\",\n  \"categoria\": \"GUIAS\",\n  \"author\": \"Level-Up Gamer Team\",\n  \"image\": \"🎮\",\n  \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/blog",
@@ -422,7 +480,36 @@
               "port": "8080",
               "path": ["api", "v1", "blog"]
             },
-            "description": "Crea un nuevo artículo en el blog.\n\n**Requiere:** Rol ADMIN o EDITOR\n**Categorías disponibles:** Gaming, Reviews, Tutoriales, Noticias, Competitivo\n**Validaciones:**\n- title: 10-200 caracteres\n- excerpt: 50-500 caracteres\n- content: mínimo 100 caracteres"
+            "description": "Crea un nuevo artículo en el blog.\n\n**Requiere:** Rol ADMIN o EDITOR"
+          },
+          "response": []
+        },
+        {
+          "name": "Crear múltiples artículos (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"title\": \"Cómo Armar el Setup Gamer Perfecto en 2025\",\n    \"excerpt\": \"Descubre los componentes esenciales para crear tu estación de juego ideal con ergonomía, rendimiento y estilo.\",\n    \"content\": \"<h2>La Guía Definitiva para tu Setup Gaming</h2><p>En 2025, tener el setup perfecto es más importante que nunca. Te guiaremos a través de cada componente esencial.</p>\",\n    \"categoria\": \"GUIAS\",\n    \"author\": \"Level-Up Gamer Team\",\n    \"image\": \"🎮\",\n    \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n  },\n  {\n    \"title\": \"Reseña: PlayStation 5 después de 3 años\",\n    \"excerpt\": \"Análisis profundo de la consola de Sony: Catálogo de juegos, rendimiento gráfico y experiencia general.\",\n    \"content\": \"<h2>PlayStation 5 Revisited</h2><p>Tres años después de su lanzamiento, la PS5 sigue siendo la consola más solicitada del mercado. Con un catálogo impresionante de exclusivas como God of War Ragnarök, Final Fantasy XVI y más.</p>\",\n    \"categoria\": \"REVIEWS\",\n    \"author\": \"Level-Up Gamer Team\",\n    \"image\": \"⭐\",\n    \"gradient\": \"linear-gradient(135deg, #f093fb 0%, #f5576c 100%)\"\n  }\n]"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/blog/bulk",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "blog", "bulk"]
+            },
+            "description": "Crea múltiples artículos en una sola solicitud.\n\n**Requiere:** Rol ADMIN"
           },
           "response": []
         },
@@ -442,7 +529,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Guía completa de PlayStation 5 - Actualizada\",\n  \"excerpt\": \"Descubre las mejores características y juegos para PS5 (versión 2025)\",\n  \"content\": \"Contenido actualizado con nueva información sobre PS5 y sus características. Este es un texto más largo con al menos 100 caracteres para cumplir con la validación mínima requerida por el sistema.\",\n  \"categoria\": \"Gaming\",\n  \"image\": \"https://example.com/ps5-v2.jpg\",\n  \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n}"
+              "raw": "{\n  \"title\": \"Cómo Armar el Setup Gamer Perfecto - Edición 2025 Actualizada\",\n  \"excerpt\": \"Descubre los componentes esenciales y las nuevas tendencias para crear tu estación de juego ideal.\",\n  \"content\": \"<h2>La Guía Definitiva para tu Setup Gaming - 2025</h2><p>Actualización con los últimos componentes y accesorios del mercado.</p>\",\n  \"categoria\": \"GUIAS\",\n  \"image\": \"🎮\",\n  \"gradient\": \"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/blog/1",
@@ -451,7 +538,7 @@
               "port": "8080",
               "path": ["api", "v1", "blog", "1"]
             },
-            "description": "Actualiza un artículo existente.\n\n**Requiere:** Rol ADMIN o EDITOR\n\nCambia el 1 por el ID del artículo a actualizar."
+            "description": "Actualiza un artículo existente.\n\n**Requiere:** Rol ADMIN o EDITOR"
           },
           "response": []
         },
@@ -472,7 +559,7 @@
               "port": "8080",
               "path": ["api", "v1", "blog", "1"]
             },
-            "description": "Elimina un artículo del blog.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID del artículo a eliminar."
+            "description": "Elimina un artículo del blog.\n\n**Requiere:** Rol ADMIN"
           },
           "response": []
         }
@@ -540,7 +627,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"usuarioId\": 1,\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 2,\n      \"precio\": 59.99\n    }\n  ],\n  \"total\": 119.98,\n  \"estado\": \"PENDIENTE\",\n  \"metodoPago\": \"TARJETA_CREDITO\"\n}"
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 1\n    }\n  ],\n  \"metodoPago\": \"Tarjeta\",\n  \"nombreEnvio\": \"Benjamin\",\n  \"apellidoEnvio\": \"García\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"telefonoEnvio\": \"912345678\",\n  \"direccionEnvio\": \"Calle Principal 123\",\n  \"departamentoEnvio\": \"Apto 4B\",\n  \"ciudadEnvio\": \"Santiago\",\n  \"regionEnvio\": \"metropolitana\",\n  \"comuna\": \"Las Condes\",\n  \"codigoPostal\": \"8320000\",\n  \"pais\": \"Chile\",\n  \"observaciones\": \"Entregar entre semana\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/ordenes",
@@ -549,12 +636,41 @@
               "port": "8080",
               "path": ["api", "v1", "ordenes"]
             },
-            "description": "Crea una nueva orden de compra.\n\n**Requiere:** Autenticación (cualquier usuario autenticado puede crear órdenes)"
+            "description": "Crea una nueva orden de compra.\n\n**Requiere:** Autenticación (cualquier usuario autenticado)\n\n**Nota:** Solo debes enviar `productoId` y `cantidad` en los items. El servidor obtiene el precio del producto automáticamente."
           },
           "response": []
         },
         {
-          "name": "Actualizar orden",
+          "name": "Crear múltiples órdenes (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"items\": [\n      {\n        \"productoId\": 1,\n        \"cantidad\": 1\n      }\n    ],\n    \"metodoPago\": \"Tarjeta\",\n    \"nombreEnvio\": \"Benjamin\",\n    \"apellidoEnvio\": \"García\",\n    \"email\": \"benjamin@levelup.cl\",\n    \"telefonoEnvio\": \"912345678\",\n    \"direccionEnvio\": \"Calle Principal 123\",\n    \"departamentoEnvio\": \"Apto 4B\",\n    \"ciudadEnvio\": \"Santiago\",\n    \"regionEnvio\": \"metropolitana\",\n    \"comuna\": \"Las Condes\",\n    \"codigoPostal\": \"8320000\",\n    \"pais\": \"Chile\"\n  },\n  {\n    \"items\": [\n      {\n        \"productoId\": 2,\n        \"cantidad\": 2\n      }\n    ],\n    \"metodoPago\": \"Transferencia\",\n    \"nombreEnvio\": \"Juan\",\n    \"apellidoEnvio\": \"Pérez\",\n    \"email\": \"juan@levelup.cl\",\n    \"telefonoEnvio\": \"987654321\",\n    \"direccionEnvio\": \"Avenida Secundaria 456\",\n    \"departamentoEnvio\": \"Casa 2\",\n    \"ciudadEnvio\": \"Valparaíso\",\n    \"regionEnvio\": \"valparaiso\",\n    \"comuna\": \"Viña del Mar\",\n    \"codigoPostal\": \"2520000\",\n    \"pais\": \"Chile\"\n  }\n]"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/ordenes/bulk",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "ordenes", "bulk"]
+            },
+            "description": "Crea múltiples órdenes en una sola solicitud.\n\n**Requiere:** Rol ADMIN"
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar orden (cambiar estado)",
           "request": {
             "method": "PUT",
             "header": [
@@ -569,7 +685,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"estado\": \"ENVIADA\",\n  \"metodoPago\": \"TARJETA_CREDITO\"\n}"
+              "raw": "{\n  \"estado\": \"COMPLETADO\",\n  \"observaciones\": \"Orden procesada y lista para envío\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/ordenes/1",
@@ -578,7 +694,7 @@
               "port": "8080",
               "path": ["api", "v1", "ordenes", "1"]
             },
-            "description": "Actualiza una orden existente.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID de la orden a actualizar."
+            "description": "Actualiza una orden existente. Si cambias el estado a COMPLETADO, se reduce automáticamente el stock de los productos.\n\n**Requiere:** Rol ADMIN\n\n**Estados disponibles:** PENDIENTE, COMPLETADO, ENVIADO, ENTREGADO, CANCELADO"
           },
           "response": []
         },
@@ -599,7 +715,7 @@
               "port": "8080",
               "path": ["api", "v1", "ordenes", "1"]
             },
-            "description": "Elimina una orden.\n\n**Requiere:** Rol ADMIN\n\nCambia el 1 por el ID de la orden a eliminar."
+            "description": "Elimina una orden.\n\n**Requiere:** Rol ADMIN"
           },
           "response": []
         }
