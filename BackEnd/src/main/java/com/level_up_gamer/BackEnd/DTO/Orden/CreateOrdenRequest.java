@@ -54,4 +54,26 @@ public class CreateOrdenRequest {
     
     @Schema(description = "Observaciones adicionales para la entrega", example = "Entregar de lunes a viernes")
     private String observaciones;
+
+    @NotBlank(message = "El email de envío es requerido")
+    @Email(message = "El email no tiene un formato válido")
+    @Schema(description = "Email de contacto para la entrega", example = "juan@example.com")
+    private String email;
+
+    @NotBlank(message = "El país de envío es requerido")
+    @Schema(description = "País de entrega", example = "Chile")
+    private String pais;
+
+    @NotBlank(message = "La comuna de envío es requerida")
+    @Schema(description = "Comuna o municipio", example = "Santiago Centro")
+    private String comuna;
+
+    @Schema(description = "Apellido para la entrega (opcional)", example = "Gómez")
+    private String apellidoEnvio;
+
+    @Schema(description = "Departamento o región administrativa (opcional)", example = "Centro")
+    private String departamentoEnvio;
+
+    @Schema(description = "ID del usuario que realiza la orden (opcional). Si no se provee, se usa el usuario autenticado.")
+    private Long usuarioId;
 }

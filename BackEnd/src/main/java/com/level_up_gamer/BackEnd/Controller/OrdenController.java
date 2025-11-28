@@ -5,6 +5,16 @@ import com.level_up_gamer.BackEnd.DTO.Orden.OrdenResponse;
 import com.level_up_gamer.BackEnd.Model.Orden.Orden;
 import com.level_up_gamer.BackEnd.Service.Orden.OrdenService;
 import com.level_up_gamer.BackEnd.Exception.ResourceNotFoundException;
+import com.level_up_gamer.BackEnd.Repository.Producto.ProductoRepository;
+import com.level_up_gamer.BackEnd.Model.Orden.OrdenItem;
+import com.level_up_gamer.BackEnd.Model.Orden.MetodoPago;
+import com.level_up_gamer.BackEnd.Model.Orden.EstadoOrden;
+import com.level_up_gamer.BackEnd.Model.Orden.InfoEnvio;
+import com.level_up_gamer.BackEnd.Model.Producto.Producto;
+import com.level_up_gamer.BackEnd.Model.Usuario.Usuario;
+import com.level_up_gamer.BackEnd.Repository.UsuarioRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,6 +47,12 @@ public class OrdenController {
 
     @Autowired
     private OrdenService ordenService;
+
+    @Autowired
+    private ProductoRepository productoRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     /**
      * Obtiene todas las órdenes
@@ -83,13 +99,101 @@ public class OrdenController {
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos")
     public ResponseEntity<?> crear(@Valid @RequestBody CreateOrdenRequest request) {
-        
         Orden orden = new Orden();
-        // Inicializar con datos básicos del request
-        // Los detalles específicos dependen de la estructura de datos deseada
-        
+
+        // Generar número único
+        orden.setNumero("ORD-" + System.currentTimeMillis());
+
+        // Estado por defecto
+        orden.setEstado(EstadoOrden.PENDIENTE);
+
+        // Mapear metodo de pago (intento flexible)
+        orden.setMetodoPago(parseMetodoPago(request.getMetodoPago()));
+
+        // Determinar usuario (por usuarioId en request o por autenticación)
+        Usuario usuario = null;
+        if (request.getUsuarioId() != null) {
+            usuario = usuarioRepository.findById(request.getUsuarioId()).orElse(null);
+            if (usuario == null) {
+                Map<String, Object> err = new HashMap<>();
+                err.put("message", "Usuario no encontrado");
+                err.put("usuarioId", request.getUsuarioId());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
+            }
+        } else {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                Object details = auth.getDetails();
+                Long idFromToken = null;
+                if (details instanceof Long) idFromToken = (Long) details;
+                else if (details instanceof Integer) idFromToken = Long.valueOf((Integer) details);
+                if (idFromToken != null) usuario = usuarioRepository.findById(idFromToken).orElse(null);
+                // If still null, try by principal (email)
+                if (usuario == null && auth.getPrincipal() instanceof String) {
+                    String email = (String) auth.getPrincipal();
+                    usuario = usuarioRepository.findByEmail(email).orElse(null);
+                }
+            }
+        }
+        if (usuario != null) {
+            orden.setUsuario(usuario);
+        }
+
+        // Mapear items y calcular total con validación de stock
+        List<OrdenItem> items = request.getItems().stream().map(ir -> {
+            Producto p = productoRepository.findById(ir.getProductoId()).orElse(null);
+            if (p == null) {
+                throw new IllegalArgumentException("PRODUCT_NOT_FOUND::" + ir.getProductoId());
+            }
+            if (p.getStock() < ir.getCantidad()) {
+                throw new IllegalArgumentException("INSUFFICIENT_STOCK::" + ir.getProductoId());
+            }
+            OrdenItem oi = new OrdenItem();
+            oi.setProducto(p);
+            oi.setCantidad(ir.getCantidad());
+            // Tomar el precio desde la entidad Producto: usar precioOferta si aplica, sino precio
+            Integer unitPrice = p.getPrecio();
+            if (Boolean.TRUE.equals(p.getOferta()) && p.getPrecioOferta() != null) {
+                unitPrice = p.getPrecioOferta();
+            }
+            oi.setPrecioUnitario(unitPrice);
+            return oi;
+        }).collect(Collectors.toList());
+
+        int total = items.stream().mapToInt(i -> i.getPrecioUnitario() * i.getCantidad()).sum();
+        orden.setTotal(total);
+        orden.setItems(items);
+
+        // Mapear info de envío
+        InfoEnvio info = new InfoEnvio();
+        info.setNombre(request.getNombreEnvio());
+        info.setApellido(request.getApellidoEnvio());
+        info.setEmail(request.getEmail());
+        info.setTelefono(request.getTelefonoEnvio());
+        info.setDireccion(request.getDireccionEnvio());
+        info.setDepartamento(request.getDepartamentoEnvio());
+        info.setCiudad(request.getCiudadEnvio());
+        info.setRegion(request.getRegionEnvio());
+        info.setComuna(request.getComuna());
+        info.setCodigoPostal(request.getCodigoPostal());
+        info.setPais(request.getPais());
+        orden.setInfoEnvio(info);
+
         Orden ordenGuardada = ordenService.saveOrden(orden);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapearAResponse(ordenGuardada));
+    }
+
+    private MetodoPago parseMetodoPago(String raw) {
+        if (raw == null) return MetodoPago.OTRO;
+        String v = raw.trim().toUpperCase();
+        if (v.contains("PAYPAL")) return MetodoPago.PAYPAL;
+        if (v.contains("TRANSFER")) return MetodoPago.TRANSFERENCIA;
+        if (v.contains("DEBIT")) return MetodoPago.TARJETA_DEBITO;
+        if (v.contains("CREDIT")) return MetodoPago.TARJETA_CREDITO;
+        if (v.contains("TARJETA") && v.contains("CREDITO")) return MetodoPago.TARJETA_CREDITO;
+        if (v.contains("TARJETA") && v.contains("DEBITO")) return MetodoPago.TARJETA_DEBITO;
+        if (v.contains("TARJETA")) return MetodoPago.TARJETA_CREDITO;
+        return MetodoPago.OTRO;
     }
 
     /**

@@ -73,4 +73,40 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
+
+    /**
+     * Maneja errores de negocio lanzados como IllegalArgumentException con códigos internos
+     * Soporta mensajes con prefijos: PRODUCT_NOT_FOUND::id y INSUFFICIENT_STOCK::id
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
+        String msg = ex.getMessage();
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+
+        if (msg != null && msg.startsWith("PRODUCT_NOT_FOUND::")) {
+            String id = msg.substring("PRODUCT_NOT_FOUND::".length());
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Producto no encontrado");
+            Map<String, Object> details = new HashMap<>();
+            details.put("productoId", id);
+            response.put("details", details);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        if (msg != null && msg.startsWith("INSUFFICIENT_STOCK::")) {
+            String id = msg.substring("INSUFFICIENT_STOCK::".length());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Stock insuficiente");
+            Map<String, Object> details = new HashMap<>();
+            details.put("productoId", id);
+            response.put("details", details);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        // Fallback
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("message", msg != null ? msg : "Argumento inválido");
+        return ResponseEntity.badRequest().body(response);
+    }
 }

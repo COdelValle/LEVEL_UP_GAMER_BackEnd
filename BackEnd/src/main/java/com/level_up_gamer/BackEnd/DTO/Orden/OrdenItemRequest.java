@@ -27,8 +27,6 @@ public class OrdenItemRequest {
     @Schema(description = "Cantidad de unidades a comprar", example = "2")
     private Integer cantidad;
     
-    @NotNull(message = "El precio es requerido")
-    @Positive(message = "El precio debe ser mayor a 0")
-    @Schema(description = "Precio unitario en el momento de la compra", example = "450000")
-    private Integer precio;
+    // El precio unitario ahora se obtiene desde la entidad Producto en el servidor
+    // para evitar que el cliente envíe datos incorrectos o manipulados.
 }
