@@ -2,6 +2,8 @@ package com.level_up_gamer.BackEnd.Controller;
 
 import com.level_up_gamer.BackEnd.DTO.Orden.CreateOrdenRequest;
 import com.level_up_gamer.BackEnd.DTO.Orden.OrdenResponse;
+import com.level_up_gamer.BackEnd.DTO.Orden.UpdateOrdenRequest;
+import com.level_up_gamer.BackEnd.DTO.Orden.OrdenItemResponse;
 import com.level_up_gamer.BackEnd.Model.Orden.Orden;
 import com.level_up_gamer.BackEnd.Service.Orden.OrdenService;
 import com.level_up_gamer.BackEnd.Exception.ResourceNotFoundException;
@@ -202,25 +204,31 @@ public class OrdenController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Actualizar orden existente", description = "Actualiza los detalles de una orden")
+    @Operation(summary = "Actualizar orden existente", description = "Actualiza el estado de una orden. Si el estado cambia a COMPLETADO, reduce automáticamente el stock de los productos")
     @ApiResponse(responseCode = "200", description = "Orden actualizada exitosamente")
     @ApiResponse(responseCode = "404", description = "Orden no encontrada")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
     public ResponseEntity<?> actualizar(
             @Parameter(description = "ID de la orden a actualizar", required = true, example = "1")
             @PathVariable Long id,
-            @Valid @RequestBody CreateOrdenRequest request) {
+            @Valid @RequestBody UpdateOrdenRequest request) {
         
         Orden orden = ordenService.getOrdenByID(id);
         if (orden == null) {
             throw new ResourceNotFoundException("Orden no encontrada");
         }
         
-        // Actualizar con datos del request
-        // Los campos específicos dependen de la estructura de datos deseada
+        // Si el nuevo estado es COMPLETADO y la orden actual no lo es, usar el método transaccional
+        if (EstadoOrden.COMPLETADO.equals(request.getEstado()) && 
+            !EstadoOrden.COMPLETADO.equals(orden.getEstado())) {
+            orden = ordenService.completarOrden(id);
+        } else {
+            // Actualizar solo el estado (para otros cambios que no requieren reducción de stock)
+            orden.setEstado(request.getEstado());
+            orden = ordenService.saveOrden(orden);
+        }
         
-        Orden actualizada = ordenService.saveOrden(orden);
-        return ResponseEntity.ok(mapearAResponse(actualizada));
+        return ResponseEntity.ok(mapearAResponse(orden));
     }
 
     /**
@@ -260,6 +268,27 @@ public class OrdenController {
         response.setNumero(orden.getNumero());
         response.setFecha(orden.getFecha());
         response.setTotal(orden.getTotal());
+        response.setEstado(orden.getEstado() != null ? orden.getEstado().toString() : null);
+        response.setMetodoPago(orden.getMetodoPago() != null ? orden.getMetodoPago().toString() : null);
+        response.setInfoEnvio(orden.getInfoEnvio());
+        if (orden.getUsuario() != null) {
+            response.setUsuarioId(orden.getUsuario().getId());
+            response.setUsuarioNombre(orden.getUsuario().getNombre());
+        }
+        
+        // Mapear items
+        if (orden.getItems() != null) {
+            response.setItems(orden.getItems().stream().map(item -> {
+                OrdenItemResponse itemResponse = new OrdenItemResponse();
+                itemResponse.setProductoId(item.getProducto().getId());
+                itemResponse.setProductoNombre(item.getProducto().getNombre());
+                itemResponse.setCantidad(item.getCantidad());
+                itemResponse.setPrecioUnitario(item.getPrecioUnitario());
+                itemResponse.setSubtotal(item.getPrecioUnitario() * item.getCantidad());
+                return itemResponse;
+            }).collect(Collectors.toList()));
+        }
+        
         return response;
     }
 }

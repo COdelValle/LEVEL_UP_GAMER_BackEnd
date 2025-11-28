@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.level_up_gamer.BackEnd.Model.Orden.InfoEnvio;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO para respuesta de orden de compra
@@ -43,4 +44,7 @@ public class OrdenResponse {
     
     @Schema(description = "Información de envío")
     private InfoEnvio infoEnvio;
+    
+    @Schema(description = "Items comprados en esta orden")
+    private List<OrdenItemResponse> items;
 }

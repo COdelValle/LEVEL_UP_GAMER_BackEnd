@@ -4,14 +4,21 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.level_up_gamer.BackEnd.Model.Orden.Orden;
+import com.level_up_gamer.BackEnd.Model.Orden.EstadoOrden;
+import com.level_up_gamer.BackEnd.Model.Orden.OrdenItem;
 import com.level_up_gamer.BackEnd.Repository.Orden.OrdenRepository;
+import com.level_up_gamer.BackEnd.Repository.Producto.ProductoRepository;
 
 @Service
 public class OrdenService {
     @Autowired
     private OrdenRepository repository;
+
+    @Autowired
+    private ProductoRepository productoRepository;
 
     // Obtener info:
         // Obtener todas las ordenes:
@@ -52,4 +59,32 @@ public class OrdenService {
             repository.deleteByNumero(numero);
             return !repository.existsByNumero(numero);
         }
+
+    /**
+     * Marca una orden como COMPLETADA y reduce el stock de los productos
+     * Este método es transaccional para garantizar consistencia de datos
+     */
+    @Transactional
+    public Orden completarOrden(Long ordenId) {
+        Orden orden = repository.findById(ordenId).orElse(null);
+        if (orden == null) {
+            throw new IllegalArgumentException("ORDEN_NOT_FOUND::" + ordenId);
+        }
+
+        // Marcar como completada
+        orden.setEstado(EstadoOrden.COMPLETADO);
+
+        // Reducir stock de cada producto en la orden
+        if (orden.getItems() != null) {
+            for (OrdenItem item : orden.getItems()) {
+                if (item.getProducto() != null) {
+                    item.getProducto().setStock(item.getProducto().getStock() - item.getCantidad());
+                    productoRepository.save(item.getProducto());
+                }
+            }
+        }
+
+        // Guardar la orden actualizada
+        return repository.save(orden);
+    }
 }

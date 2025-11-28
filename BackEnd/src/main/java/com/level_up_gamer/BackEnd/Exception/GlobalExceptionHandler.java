@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Maneja errores de negocio lanzados como IllegalArgumentException con códigos internos
-     * Soporta mensajes con prefijos: PRODUCT_NOT_FOUND::id y INSUFFICIENT_STOCK::id
+     * Soporta mensajes con prefijos: PRODUCT_NOT_FOUND::id, INSUFFICIENT_STOCK::id y ORDEN_NOT_FOUND::id
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
@@ -102,6 +102,16 @@ public class GlobalExceptionHandler {
             details.put("productoId", id);
             response.put("details", details);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        if (msg != null && msg.startsWith("ORDEN_NOT_FOUND::")) {
+            String id = msg.substring("ORDEN_NOT_FOUND::".length());
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Orden no encontrada");
+            Map<String, Object> details = new HashMap<>();
+            details.put("ordenId", id);
+            response.put("details", details);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         // Fallback
