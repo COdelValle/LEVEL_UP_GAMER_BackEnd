@@ -41,6 +41,11 @@ public class OrdenService {
         return repository.save(o);
     }
 
+    // Guardar múltiples órdenes:
+    public List<Orden> saveAllOrdenes(List<Orden> ordenes){
+        return repository.saveAll(ordenes);
+    }
+
     // Eliminar orden:
         // Por Objeto:
         public Boolean deleteOrden(Orden o){

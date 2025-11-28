@@ -4,18 +4,22 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.level_up_gamer.BackEnd.Model.Usuario.Usuario;
+import com.level_up_gamer.BackEnd.Model.Usuario.RolUsuario;
 import com.level_up_gamer.BackEnd.DTO.Usuario.UpdateUsuarioRequest;
 import com.level_up_gamer.BackEnd.Service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Controlador para gestionar Usuarios
@@ -143,6 +147,35 @@ public class UsuarioController {
                 .body(new ErrorResponse("Usuario no encontrado"));
         }
     }
+
+    /**
+     * Crea múltiples usuarios a la vez
+     * Acceso: Solo ADMIN
+     */
+    @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Crear múltiples usuarios", description = "Crea varios usuarios en una sola solicitud")
+    public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateBulkUsuarioRequest> requests) {
+        List<Usuario> usuarios = requests.stream().map(request -> {
+            Usuario usuario = new Usuario();
+            usuario.setNombre(request.getNombre());
+            usuario.setEmail(request.getEmail());
+            usuario.setPassword(usuarioService.encryptPassword(request.getPassword()));
+            usuario.setApiKey(request.getApiKey());
+            usuario.setRol(RolUsuario.valueOf(request.getRol().toUpperCase()));
+            usuario.setFechaCreacion(LocalDateTime.now());
+            return usuario;
+        }).collect(Collectors.toList());
+
+        List<Usuario> usuariosGuardados = usuarioService.saveAllUsuarios(usuarios);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("mensaje", "Usuarios creados exitosamente");
+        response.put("cantidad", usuariosGuardados.size());
+        response.put("usuarios", usuariosGuardados);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
     
     // Clase interna para manejar errores:
     public static class ErrorResponse {
@@ -155,5 +188,31 @@ public class UsuarioController {
         public String getError() {
             return error;
         }
+    }
+
+    /**
+     * DTO para crear múltiples usuarios
+     */
+    public static class CreateBulkUsuarioRequest {
+        private String nombre;
+        private String email;
+        private String password;
+        private String apiKey;
+        private String rol = "USER";
+
+        public String getNombre() { return nombre; }
+        public void setNombre(String nombre) { this.nombre = nombre; }
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+
+        public String getApiKey() { return apiKey; }
+        public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+
+        public String getRol() { return rol; }
+        public void setRol(String rol) { this.rol = rol; }
     }
 }

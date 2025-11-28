@@ -34,6 +34,11 @@ public class ProductoService {
         return repository.save(o);
     }
 
+    // Guardar múltiples productos:
+    public List<Producto> saveAllProductos(List<Producto> productos){
+        return repository.saveAll(productos);
+    }
+
     // Eliminar Producto:
         // Por Objeto:
         public Boolean deleteProducto(Producto o){

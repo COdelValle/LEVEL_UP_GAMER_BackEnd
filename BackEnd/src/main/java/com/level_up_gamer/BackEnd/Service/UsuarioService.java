@@ -46,6 +46,11 @@ public class UsuarioService {
         return repository.save(o);
     }
 
+    // Guardar múltiples usuarios:
+    public List<Usuario> saveAllUsuarios(List<Usuario> usuarios){
+        return repository.saveAll(usuarios);
+    }
+
     // Encriptar contraseña:
     public String encryptPassword(String password) {
         return passwordEncrypter.encryptPassword(password);

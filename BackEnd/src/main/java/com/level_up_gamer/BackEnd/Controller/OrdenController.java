@@ -185,6 +185,101 @@ public class OrdenController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapearAResponse(ordenGuardada));
     }
 
+    /**
+     * Crea múltiples órdenes a la vez
+     * Acceso: Solo ADMIN
+     */
+    @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Crear múltiples órdenes", description = "Crea varias órdenes en una sola solicitud")
+    @ApiResponse(responseCode = "201", description = "Órdenes creadas exitosamente")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateOrdenRequest> requests) {
+        List<Orden> ordenes = requests.stream().map(request -> {
+            Orden orden = new Orden();
+
+            // Generar número único
+            orden.setNumero("ORD-" + System.currentTimeMillis());
+
+            // Estado por defecto
+            orden.setEstado(EstadoOrden.PENDIENTE);
+
+            // Mapear metodo de pago
+            orden.setMetodoPago(parseMetodoPago(request.getMetodoPago()));
+
+            // Mapear items y calcular total con validación de stock
+            List<OrdenItem> items = request.getItems().stream().map(ir -> {
+                Producto p = productoRepository.findById(ir.getProductoId()).orElse(null);
+                if (p == null) {
+                    throw new IllegalArgumentException("PRODUCT_NOT_FOUND::" + ir.getProductoId());
+                }
+                if (p.getStock() < ir.getCantidad()) {
+                    throw new IllegalArgumentException("INSUFFICIENT_STOCK::" + ir.getProductoId());
+                }
+                OrdenItem oi = new OrdenItem();
+                oi.setProducto(p);
+                oi.setCantidad(ir.getCantidad());
+                Integer unitPrice = p.getPrecio();
+                if (Boolean.TRUE.equals(p.getOferta()) && p.getPrecioOferta() != null) {
+                    unitPrice = p.getPrecioOferta();
+                }
+                oi.setPrecioUnitario(unitPrice);
+                return oi;
+            }).collect(Collectors.toList());
+
+            int total = items.stream().mapToInt(i -> i.getPrecioUnitario() * i.getCantidad()).sum();
+            orden.setTotal(total);
+            orden.setItems(items);
+
+            // Mapear info de envío
+            InfoEnvio info = new InfoEnvio();
+            info.setNombre(request.getNombreEnvio());
+            info.setApellido(request.getApellidoEnvio());
+            info.setEmail(request.getEmail());
+            info.setTelefono(request.getTelefonoEnvio());
+            info.setDireccion(request.getDireccionEnvio());
+            info.setDepartamento(request.getDepartamentoEnvio());
+            info.setCiudad(request.getCiudadEnvio());
+            info.setRegion(request.getRegionEnvio());
+            info.setComuna(request.getComuna());
+            info.setCodigoPostal(request.getCodigoPostal());
+            info.setPais(request.getPais());
+            orden.setInfoEnvio(info);
+
+            // Determinar usuario
+            Usuario usuario = null;
+            if (request.getUsuarioId() != null) {
+                usuario = usuarioRepository.findById(request.getUsuarioId()).orElse(null);
+            } else {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null) {
+                    Object details = auth.getDetails();
+                    Long idFromToken = null;
+                    if (details instanceof Long) idFromToken = (Long) details;
+                    else if (details instanceof Integer) idFromToken = Long.valueOf((Integer) details);
+                    if (idFromToken != null) usuario = usuarioRepository.findById(idFromToken).orElse(null);
+                    if (usuario == null && auth.getPrincipal() instanceof String) {
+                        String email = (String) auth.getPrincipal();
+                        usuario = usuarioRepository.findByEmail(email).orElse(null);
+                    }
+                }
+            }
+            if (usuario != null) {
+                orden.setUsuario(usuario);
+            }
+
+            return orden;
+        }).collect(Collectors.toList());
+
+        List<Orden> ordenesGuardadas = ordenService.saveAllOrdenes(ordenes);
+        List<OrdenResponse> response = ordenesGuardadas.stream()
+                .map(this::mapearAResponse)
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
     private MetodoPago parseMetodoPago(String raw) {
         if (raw == null) return MetodoPago.OTRO;
         String v = raw.trim().toUpperCase();

@@ -34,6 +34,11 @@ public class BlogService {
         return repository.save(o);
     }
 
+    // Guardar múltiples blogs:
+    public List<Blog> saveAllBlogs(List<Blog> blogs){
+        return repository.saveAll(blogs);
+    }
+
     // Eliminar Blog:
         // Por Objeto:
         public Boolean deleteBlog(Blog o){

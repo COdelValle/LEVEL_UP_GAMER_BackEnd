@@ -34,6 +34,11 @@ public class CategoriaProductoService {
         return repository.save(o);
     }
 
+    // Guardar múltiples categorías:
+    public List<CategoriaProducto> saveAllCategoriasProducto(List<CategoriaProducto> categorias){
+        return repository.saveAll(categorias);
+    }
+
     // Eliminar CategoriaProducto:
         // Por Objeto:
         public Boolean deleteCategoriaProducto(CategoriaProducto o){

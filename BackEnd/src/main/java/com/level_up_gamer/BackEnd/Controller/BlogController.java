@@ -241,6 +241,49 @@ public class BlogController {
     }
 
     /**
+     * Crea múltiples artículos en el blog
+     * Acceso: Solo ADMIN
+     */
+    @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Crear múltiples artículos",
+            description = "Crea varios artículos en el blog en una sola solicitud",
+            tags = {"Blog", "Administración"}
+    )
+    @ApiResponse(
+            responseCode = "201",
+            description = "Artículos creados exitosamente",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
+            )
+    )
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateBlogRequest> requests) {
+        List<Blog> blogs = requests.stream().map(request -> {
+            Blog blog = new Blog();
+            blog.setTitle(request.getTitle());
+            blog.setExcerpt(request.getExcerpt());
+            blog.setContent(request.getContent());
+            blog.setCategoria(CategoriaBlog.valueOf(request.getCategoria().toUpperCase()));
+            blog.setAuthor(request.getAuthor());
+            blog.setFecha(java.time.LocalDate.now());
+            blog.setImage(request.getImage());
+            blog.setGradient(request.getGradient());
+            return blog;
+        }).collect(Collectors.toList());
+
+        List<Blog> blogsGuardados = blogService.saveAllBlogs(blogs);
+        List<BlogResponse> response = blogsGuardados.stream()
+                .map(this::mapearAResponse)
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
      * Actualiza un artículo existente
      * 
      * Campos actualizables:

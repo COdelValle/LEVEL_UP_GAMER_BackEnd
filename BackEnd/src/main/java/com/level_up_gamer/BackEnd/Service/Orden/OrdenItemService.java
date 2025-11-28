@@ -29,6 +29,11 @@ public class OrdenItemService {
         return repository.save(o);
     }
 
+    // Guardar múltiples items:
+    public List<OrdenItem> saveAllOrdenItems(List<OrdenItem> items){
+        return repository.saveAll(items);
+    }
+
     // Eliminar item:
         // Por Objeto:
         public Boolean deleteOrdenItem(OrdenItem o){

@@ -99,6 +99,38 @@ public class ProductoController {
     }
 
     /**
+     * Crea múltiples productos a la vez
+     * Acceso: Solo ADMIN
+     */
+    @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Crear múltiples productos", description = "Crea varios productos en una sola solicitud")
+    @ApiResponse(responseCode = "201", description = "Productos creados exitosamente")
+    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateProductoRequest> requests) {
+        List<Producto> productos = requests.stream().map(request -> {
+            Producto producto = new Producto();
+            producto.setNombre(request.getNombre());
+            producto.setPrecio(request.getPrecio());
+            producto.setCategoria(request.getCategoria());
+            producto.setStock(request.getStock());
+            producto.setDescripcion(request.getDescripcion());
+            producto.setImagen(request.getImagen());
+            producto.setDestacado(request.getDestacado() != null ? request.getDestacado() : false);
+            producto.setNuevo(request.getNuevo() != null ? request.getNuevo() : false);
+            return producto;
+        }).collect(Collectors.toList());
+
+        List<Producto> productosGuardados = productoService.saveAllProductos(productos);
+        List<ProductoResponse> response = productosGuardados.stream()
+                .map(this::mapearAResponse)
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
      * Actualiza un producto existente
      * Acceso: Solo ADMIN y SELLER
      */
