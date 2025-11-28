@@ -1,7 +1,8 @@
 package com.level_up_gamer.BackEnd.Model.Orden;
 
 public enum MetodoPago {
-    TARJETA,
+    TARJETA_DEBITO,
+    TARJETA_CREDITO,
     TRANSFERENCIA,
     PAYPAL,
     OTRO
