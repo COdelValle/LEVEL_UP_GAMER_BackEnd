@@ -196,7 +196,7 @@ public class BlogController {
      * @return ResponseEntity con BlogResponse del artículo creado
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @Operation(
             summary = "Crear nuevo artículo",
             description = "Crea un nuevo artículo en el blog. Solo administradores y editores pueden " +
@@ -301,7 +301,7 @@ public class BlogController {
      * @throws ResourceNotFoundException si el artículo no existe
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @Operation(
             summary = "Actualizar artículo",
             description = "Actualiza los detalles de un artículo existente. Solo administradores " +

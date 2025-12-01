@@ -69,6 +69,17 @@ public class JwtProvider {
                 .get("usuarioId");
         return usuarioId != null ? ((Number) usuarioId).longValue() : null;
     }
+
+    public String getRolFromToken(String token) {
+        Object rol = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("rol");
+
+        return rol != null ? rol.toString() : null;
+    }
     
     public boolean validateToken(String token) {
         try {
