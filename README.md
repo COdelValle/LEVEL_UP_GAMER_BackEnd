@@ -6,7 +6,23 @@ Una API RESTful para la plataforma LEVEL_UP_GAMER: gestión de usuarios, product
 
 **Estado:** En desarrollo / Hotfix branch activo
 
-**Stack principal**
+## Tabla de contenidos
+
+- [LEVEL\_UP\_GAMER BackEnd 🚀](#level_up_gamer-backend-)
+  - [Tabla de contenidos](#tabla-de-contenidos)
+  - [Stack principal](#stack-principal)
+  - [Estructura principal del proyecto](#estructura-principal-del-proyecto)
+    - [Stack principal (detalles)](#stack-principal-detalles)
+  - [Primeros pasos (ejecutar localmente)](#primeros-pasos-ejecutar-localmente)
+  - [Autenticación rápida](#autenticación-rápida)
+  - [Colección Postman](#colección-postman)
+  - [Tutorial para Frontend](#tutorial-para-frontend)
+  - [Usar token para llamar endpoint protegido](#usar-token-para-llamar-endpoint-protegido)
+  - [Usar API Key](#usar-api-key)
+  - [Tecnologías y dependencias principales](#tecnologías-y-dependencias-principales)
+  - [Notas sobre Java](#notas-sobre-java)
+
+## Stack principal
 - **Java 21** (configurado en `pom.xml`)
 - **Spring Boot 3.5.7**
 - **Spring Boot** (Web, Security)
@@ -14,8 +30,8 @@ Una API RESTful para la plataforma LEVEL_UP_GAMER: gestión de usuarios, product
 - **API Keys** alternativamente mediante header `X-API-Key`
 - **Maven** (wrapper incluido: `mvnw`)
 
-**Estructura principal del proyecto**
-**Stack principal**
+## Estructura principal del proyecto
+### Stack principal (detalles)
 - Java 21 (configurado en `pom.xml`)
 - Spring Boot 3.5.7
 - Spring Web (REST)
@@ -28,16 +44,9 @@ Una API RESTful para la plataforma LEVEL_UP_GAMER: gestión de usuarios, product
 - Los roles en el sistema son gestionados como `ROLE_USER`, `ROLE_ADMIN`, `ROLE_SELLER`, `ROLE_GUEST`.
 - Las anotaciones `@PreAuthorize` están habilitadas (se usa `@EnableMethodSecurity`) y el filtro asigna authorities desde el claim `rol` del JWT o desde el usuario asociado a una `X-API-Key`.
 
-**Primeros pasos (ejecutar localmente)**
-1. Abrir PowerShell en la raíz del repo (donde está `BackEnd`).
-2. Compilar y ejecutar:
+## Primeros pasos (ejecutar localmente)
 
-```powershell
-cd BackEnd
-.\mvnw clean package -DskipTests
-.\mvnw spring-boot:run
-**Primeros pasos (ejecución local)**
-1. Abrir consola en la raíz del repositorio (carpeta `BackEnd`).
+1. Abrir PowerShell en la raíz del repo (carpeta `BackEnd`).
 2. Compilar y ejecutar con Maven (wrapper incluido):
 
 ```powershell
@@ -48,7 +57,7 @@ cd BackEnd
 
 La aplicación se expone por defecto en `http://localhost:8080`.
 
-**Autenticación rápida**
+## Autenticación rápida
 - Registro y login: las rutas públicas de autenticación están bajo `POST /api/v1/auth/**` y devuelven un token JWT y, cuando corresponde, una `apiKey`.
 - Usar el header `Authorization: Bearer {token}` para llamadas autenticadas con JWT.
 - Para integraciones máquina-a-máquina, usar el header `X-API-Key: {apiKey}`.
@@ -59,19 +68,23 @@ La aplicación se expone por defecto en `http://localhost:8080`.
 # 1) Login (ejemplo genérico)
 curl -X POST "http://localhost:8080/api/v1/auth/login" -H "Content-Type: application/json" -d '{"email":"tu@email","password":"tuPass"}'
 ```
-**Colección Postman**
-- Existe una colección lista para importar: `docs/LEVEL_UP_GAMER.postman_collection.json`.
+## Colección Postman
 
-Pasos para importar y usar la colección:
+Existe una colección lista para importar: [docs/LEVEL_UP_GAMER.postman_collection.json](docs/LEVEL_UP_GAMER.postman_collection.json).
+
 1. Postman → Import → seleccionar `docs/LEVEL_UP_GAMER.postman_collection.json`.
 2. La colección está organizada por áreas: Autenticación, Usuarios, Productos, Blog, Órdenes.
-3. Tras realizar login, copiar el token y colocarlo en la variable `{{token}}` de la colección o usar el header `Authorization: Bearer {TOKEN}`.
-4. Para pruebas de integración máquina-a-máquina usar `X-API-Key: {API_KEY}`.
+3. Después de hacer `login` copia el `token` y pégalo en la variable `{{token}}` de la colección o usa el header `Authorization: Bearer {TOKEN}`.
 
-# 2) Usar token para llamar endpoint protegido
+## Tutorial para Frontend
 
-# 3) Usar API Key
-**Tecnologías y dependencias principales**
+- **Archivo:** [docs/Tutorial_conexión_FrontEnd.md](docs/Tutorial_conexión_FrontEnd.md) — contiene un `APIHelper` de ejemplo (implementación con `fetch`), instrucciones rápidas de uso, buenas prácticas de seguridad y ejemplos para llamadas autenticadas con `Authorization: Bearer {token}` o `X-API-Key`.
+- **Para tus compañeros:** importar la colección Postman en [docs/LEVEL_UP_GAMER.postman_collection.json](docs/LEVEL_UP_GAMER.postman_collection.json) y revisar [docs/Tutorial_conexión_FrontEnd.md](docs/Tutorial_conexión_FrontEnd.md) para un ejemplo práctico paso a paso sobre cómo autenticar y consumir los endpoints protegidos.
+
+## Usar token para llamar endpoint protegido
+
+## Usar API Key
+## Tecnologías y dependencias principales
 El proyecto utiliza Maven y las dependencias más relevantes (nombres simplificados) son:
 
 - Spring Web
@@ -87,9 +100,9 @@ El proyecto utiliza Maven y las dependencias más relevantes (nombres simplifica
 - Librerías de test: Spring Boot Test y Spring Security Test
 ------------------
 - Hay una colección lista para importar en `docs/LEVEL_UP_GAMER.postman_collection.json`.
-**Notas sobre Java**
+## Notas sobre Java
 - El proyecto está configurado para usar Java 21 (`<java.version>21</java.version>` en `pom.xml`). Se recomienda compilar y ejecutar con JDK 21 para evitar incompatibilidades.
-	2. La colección trae requests organizados por área (Auth, Usuarios, Productos, Blog, Órdenes).
-	3. Después de hacer `login` copia el `token` y pégalo en la variable `{{token}}` de la colección o usa el header `Authorization: Bearer {TOKEN}`.
-Material adicional
-- En `docs/` está la colección Postman mencionada. Se puede añadir un archivo de entorno para Postman con variables ejemplo (`token`, `apiKey`, `baseUrl`) si se desea.
+1. La colección trae requests organizados por área (Auth, Usuarios, Productos, Blog, Órdenes).
+2. Después de hacer `login` copia el `token` y pégalo en la variable `{{token}}` de la colección o usa el header `Authorization: Bearer {TOKEN}`.
+
+
