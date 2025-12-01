@@ -45,10 +45,6 @@ public class OpenApiConfig {
                         .url("http://localhost:8080")
                         .description("Servidor de desarrollo")
                 )
-                .addServersItem(new Server()
-                        .url("https://api.levelupgamer.com")
-                        .description("Servidor de producción")
-                )
                 
                 // Esquemas de seguridad
                 .components(new Components()
