@@ -79,7 +79,7 @@ Existe una colección lista para importar: [docs/LEVEL_UP_GAMER.postman_collecti
 ## Tutorial para Frontend
 
 - **Archivo:** [docs/Tutorial_conexión_FrontEnd.md](docs/Tutorial_conexión_FrontEnd.md) — contiene un `APIHelper` de ejemplo (implementación con `fetch`), instrucciones rápidas de uso, buenas prácticas de seguridad y ejemplos para llamadas autenticadas con `Authorization: Bearer {token}` o `X-API-Key`.
-- **Para tus compañeros:** importar la colección Postman en [docs/LEVEL_UP_GAMER.postman_collection.json](docs/LEVEL_UP_GAMER.postman_collection.json) y revisar [docs/Tutorial_conexión_FrontEnd.md](docs/Tutorial_conexión_FrontEnd.md) para un ejemplo práctico paso a paso sobre cómo autenticar y consumir los endpoints protegidos.
+- **Para equipo de desarrollo:** importar la colección Postman en [docs/LEVEL_UP_GAMER.postman_collection.json](docs/LEVEL_UP_GAMER.postman_collection.json) y revisar [docs/Tutorial_conexión_FrontEnd.md](docs/Tutorial_conexión_FrontEnd.md) para un ejemplo práctico paso a paso sobre cómo autenticar y consumir los endpoints protegidos.
 
 ## Usar token para llamar endpoint protegido
 
