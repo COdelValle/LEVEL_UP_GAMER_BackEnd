@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Controlador para gestionar Usuarios
@@ -116,13 +118,22 @@ public class UsuarioController {
                 usuario.setPassword(passwordEncriptada);
             }
             
-            // Actualizar rol si se proporciona
+            // Actualizar rol si se proporciona (solo ADMIN puede cambiar roles)
             if (request.getRol() != null && !request.getRol().isEmpty()) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                boolean isAdmin = auth != null && auth.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+                if (!isAdmin) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(new ErrorResponse("Acceso denegado: solo administradores pueden cambiar el rol"));
+                }
+
                 try {
                     usuario.setRol(com.level_up_gamer.BackEnd.Model.Usuario.RolUsuario.valueOf(request.getRol().toUpperCase()));
                 } catch (IllegalArgumentException e) {
                     return ResponseEntity.badRequest()
-                        .body(new ErrorResponse("Rol inválido. Valores permitidos: USER, ADMIN, SELLER, GUEST"));
+                            .body(new ErrorResponse("Rol inválido. Valores permitidos: USER, ADMIN, SELLER, GUEST"));
                 }
             }
             
