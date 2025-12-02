@@ -3,6 +3,7 @@ package com.level_up_gamer.BackEnd.DTO.Auth;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.level_up_gamer.BackEnd.Validation.RUT;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,11 @@ public class RegisterRequest {
     @Email(message = "El email debe ser válido")
     @Schema(description = "Correo electrónico único para el usuario", example = "usuario@gmail.com")
     private String email;
+    
+    @NotBlank(message = "El RUT es requerido")
+    @RUT(message = "El RUT no es válido")
+    @Schema(description = "RUT chileno del usuario (sin puntos, con guión opcional)", example = "12345678-5")
+    private String rut;
     
     @NotBlank(message = "La contraseña es requerida")
     @Size(min = 6, max = 100, message = "La contraseña debe tener entre 6 y 100 caracteres")

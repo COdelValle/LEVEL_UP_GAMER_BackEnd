@@ -40,6 +40,11 @@ public class UsuarioService {
         public Usuario getUsuarioByEmail(String email){
             return repository.findByEmail(email).orElse(null);
         }
+
+        // Por RUT:
+        public Usuario getUsuarioByRut(String rut){
+            return repository.findByRut(rut).orElse(null);
+        }
     
     // Guardar(agregar o actualizar) usuario:
     public Usuario saveUsuario(Usuario o){
@@ -87,11 +92,16 @@ public class UsuarioService {
             if (repository.existsByEmail(request.getEmail())) {
                 throw new Exception("El email ya está registrado");
             }
+            // Validar que el RUT no existe
+            if (request.getRut() != null && repository.existsByRut(request.getRut())) {
+                throw new Exception("El RUT ya está registrado");
+            }
             
             // Crear nuevo usuario
             Usuario usuario = new Usuario();
             usuario.setNombre(request.getNombre());
             usuario.setEmail(request.getEmail());
+            usuario.setRut(request.getRut());
             usuario.setPassword(passwordEncrypter.encryptPassword(request.getPassword()));
             usuario.setApiKey(passwordEncrypter.generateApiKey());
             usuario.setFechaCreacion(LocalDateTime.now());

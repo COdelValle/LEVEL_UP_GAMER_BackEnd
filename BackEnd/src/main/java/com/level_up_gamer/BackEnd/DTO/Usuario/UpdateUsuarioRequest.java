@@ -1,6 +1,7 @@
 package com.level_up_gamer.BackEnd.DTO.Usuario;
 
 import jakarta.validation.constraints.*;
+import com.level_up_gamer.BackEnd.Validation.RUT;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,4 +41,8 @@ public class UpdateUsuarioRequest {
     
     @Schema(description = "Rol del usuario en el sistema. Solo ADMIN puede cambiar roles. Valores: USER, ADMIN, SELLER, GUEST", example = "ADMIN")
     private String rol;
+
+    @RUT(message = "El RUT no es válido")
+    @Schema(description = "RUT chileno del usuario (opcional)", example = "12345678-5")
+    private String rut;
 }
