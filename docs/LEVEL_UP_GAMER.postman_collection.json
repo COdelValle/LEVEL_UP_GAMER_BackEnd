@@ -22,7 +22,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Benjamin\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"password\": \"123456\",\n  \"passwordConfirm\": \"123456\"\n}"
+              "raw": "{\n  \"nombre\": \"Benjamin\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"rut\": \"12345678-5\",\n  \"password\": \"123456\",\n  \"passwordConfirm\": \"123456\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/auth/register",
@@ -166,7 +166,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Benjamin García\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"rol\": \"USER\"\n}"
+              "raw": "{\n  \"nombre\": \"Benjamin García\",\n  \"email\": \"benjamin@levelup.cl\",\n  \"rut\": \"12345678-5\",\n  \"rol\": \"USER\"\n}"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/usuarios/1",
@@ -195,7 +195,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "[\n  {\n    \"nombre\": \"Juan García\",\n    \"email\": \"juan@levelup.cl\",\n    \"password\": \"123456\",\n    \"apiKey\": \"api-key-juan\",\n    \"rol\": \"USER\"\n  },\n  {\n    \"nombre\": \"María López\",\n    \"email\": \"maria@levelup.cl\",\n    \"password\": \"123456\",\n    \"apiKey\": \"api-key-maria\",\n    \"rol\": \"SELLER\"\n  }\n]"
+              "raw": "[\n  {\n    \"nombre\": \"Juan García\",\n    \"email\": \"juan@levelup.cl\",\n    \"rut\": \"11111111-1\",\n    \"password\": \"123456\",\n    \"apiKey\": \"api-key-juan\",\n    \"rol\": \"USER\"\n  },\n  {\n    \"nombre\": \"María López\",\n    \"email\": \"maria@levelup.cl\",\n    \"rut\": \"22222222-2\",\n    \"password\": \"123456\",\n    \"apiKey\": \"api-key-maria\",\n    \"rol\": \"SELLER\"\n  }\n]"
             },
             "url": {
               "raw": "http://localhost:8080/api/v1/usuarios/bulk",
