@@ -98,6 +98,16 @@ public class UsuarioController {
                 }
                 usuario.setEmail(request.getEmail());
             }
+
+            // Actualizar RUT si se proporciona
+            if (request.getRut() != null && !request.getRut().isEmpty()) {
+                Usuario usuarioExistentePorRut = usuarioService.getUsuarioByRut(request.getRut());
+                if (usuarioExistentePorRut != null && !usuarioExistentePorRut.getId().equals(id)) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body(new ErrorResponse("El RUT ya está registrado por otro usuario"));
+                }
+                usuario.setRut(request.getRut());
+            }
             
             // Actualizar contraseña si se proporciona
             if (request.getPassword() != null && !request.getPassword().isEmpty()) {
@@ -171,6 +181,7 @@ public class UsuarioController {
             Usuario usuario = new Usuario();
             usuario.setNombre(request.getNombre());
             usuario.setEmail(request.getEmail());
+            usuario.setRut(request.getRut());
             usuario.setPassword(usuarioService.encryptPassword(request.getPassword()));
             usuario.setApiKey(request.getApiKey());
             usuario.setRol(RolUsuario.valueOf(request.getRol().toUpperCase()));
@@ -207,6 +218,7 @@ public class UsuarioController {
     public static class CreateBulkUsuarioRequest {
         private String nombre;
         private String email;
+        private String rut;
         private String password;
         private String apiKey;
         private String rol = "USER";
@@ -216,6 +228,9 @@ public class UsuarioController {
 
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+
+        public String getRut() { return rut; }
+        public void setRut(String rut) { this.rut = rut; }
 
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }

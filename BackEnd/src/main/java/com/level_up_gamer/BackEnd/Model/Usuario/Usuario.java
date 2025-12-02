@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import com.level_up_gamer.BackEnd.Validation.RUT;
 import lombok.*;
 
 @Data
@@ -26,6 +27,11 @@ public class Usuario {
     @Email(message = "El email debe ser válido")
     @Column(nullable = false, unique = true)
     private String email;
+
+    @NotBlank(message = "El RUT es requerido")
+    @RUT(message = "El RUT no es válido")
+    @Column(nullable = false, unique = true)
+    private String rut;
     
     @NotBlank(message = "La contraseña es requerida")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
