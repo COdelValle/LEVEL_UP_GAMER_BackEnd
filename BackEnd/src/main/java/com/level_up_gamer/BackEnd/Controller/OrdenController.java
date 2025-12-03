@@ -60,7 +60,7 @@ public class OrdenController {
      * Obtiene todas las órdenes
      */
     @GetMapping
-    @Operation(summary = "Obtener todas las órdenes", description = "Retorna una lista de todas las órdenes")
+    @Operation(summary = "Obtener todas las órdenes", description = "Retorna una lista de todas las órdenes. Acceso: requiere autenticación (cualquier usuario autenticado).")
     @ApiResponse(responseCode = "200", description = "Lista de órdenes obtenida exitosamente")
     public ResponseEntity<?> obtenerTodas() {
         List<Orden> ordenes = ordenService.getOrdenes();
@@ -75,7 +75,7 @@ public class OrdenController {
      * Obtiene una orden específica por su ID
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener orden por ID", description = "Retorna los detalles de una orden específica")
+    @Operation(summary = "Obtener orden por ID", description = "Retorna los detalles de una orden específica. Acceso: requiere autenticación (cualquier usuario autenticado).")
     @ApiResponse(responseCode = "200", description = "Orden encontrada")
     @ApiResponse(responseCode = "404", description = "Orden no encontrada")
     public ResponseEntity<?> obtenerPorId(
@@ -191,7 +191,7 @@ public class OrdenController {
      */
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear múltiples órdenes", description = "Crea varias órdenes en una sola solicitud")
+    @Operation(summary = "Crear múltiples órdenes", description = "Crea varias órdenes en una sola solicitud. Acceso: requiere rol ADMIN.")
     @ApiResponse(responseCode = "201", description = "Órdenes creadas exitosamente")
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
@@ -299,7 +299,7 @@ public class OrdenController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Actualizar orden existente", description = "Actualiza el estado de una orden. Si el estado cambia a COMPLETADO, reduce automáticamente el stock de los productos")
+    @Operation(summary = "Actualizar orden existente", description = "Actualiza el estado de una orden. Si el estado cambia a COMPLETADO, reduce automáticamente el stock de los productos. Acceso: requiere rol ADMIN.")
     @ApiResponse(responseCode = "200", description = "Orden actualizada exitosamente")
     @ApiResponse(responseCode = "404", description = "Orden no encontrada")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
@@ -332,7 +332,7 @@ public class OrdenController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Eliminar orden", description = "Elimina una orden")
+    @Operation(summary = "Eliminar orden", description = "Elimina una orden. Acceso: requiere rol ADMIN.")
     @ApiResponse(responseCode = "200", description = "Orden eliminada exitosamente")
     @ApiResponse(responseCode = "404", description = "Orden no encontrada")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")

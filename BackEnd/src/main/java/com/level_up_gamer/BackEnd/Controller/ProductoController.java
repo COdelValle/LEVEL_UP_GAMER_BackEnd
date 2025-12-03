@@ -80,7 +80,7 @@ public class ProductoController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
-    @Operation(summary = "Crear nuevo producto", description = "Crea un nuevo producto")
+    @Operation(summary = "Crear nuevo producto", description = "Crea un nuevo producto. Acceso: requiere rol ADMIN o SELLER.")
     @ApiResponse(responseCode = "201", description = "Producto creado exitosamente")
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos")
@@ -111,7 +111,7 @@ public class ProductoController {
      */
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear múltiples productos", description = "Crea varios productos en una sola solicitud")
+    @Operation(summary = "Crear múltiples productos", description = "Crea varios productos en una sola solicitud. Acceso: requiere rol ADMIN.")
     @ApiResponse(responseCode = "201", description = "Productos creados exitosamente")
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
@@ -148,7 +148,7 @@ public class ProductoController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
-    @Operation(summary = "Actualizar producto existente", description = "Actualiza los detalles de un producto")
+    @Operation(summary = "Actualizar producto existente", description = "Actualiza los detalles de un producto. Acceso: requiere rol ADMIN o SELLER.")
     @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente")
     @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     @ApiResponse(responseCode = "403", description = "No tiene permisos")
@@ -181,7 +181,7 @@ public class ProductoController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Eliminar producto", description = "Elimina un producto del catálogo")
+    @Operation(summary = "Eliminar producto", description = "Elimina un producto del catálogo. Acceso: requiere rol ADMIN.")
     @ApiResponse(responseCode = "200", description = "Producto eliminado exitosamente")
     @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")

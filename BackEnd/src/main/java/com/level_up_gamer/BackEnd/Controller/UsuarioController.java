@@ -42,7 +42,7 @@ public class UsuarioController {
     // Obtener info:
         // Todos los Usuarios:
         @GetMapping
-        @Operation(summary = "Obtener todos los usuarios", description = "Retorna una lista de todos los usuarios registrados")
+        @Operation(summary = "Obtener todos los usuarios", description = "Retorna una lista de todos los usuarios registrados. Acceso: requiere autenticación (cualquier usuario autenticado).")
         public ResponseEntity<List<Usuario>> getAllUsuarios() {
             List<Usuario> usuarios = usuarioService.getUsuarios();
             return ResponseEntity.ok(usuarios);
@@ -50,7 +50,7 @@ public class UsuarioController {
         
         // Por ID:
         @GetMapping("/{id}")
-        @Operation(summary = "Obtener usuario por ID", description = "Retorna los detalles de un usuario específico")
+        @Operation(summary = "Obtener usuario por ID", description = "Retorna los detalles de un usuario específico. Acceso: requiere autenticación (cualquier usuario autenticado).")
         public ResponseEntity<?> getUsuarioById(@PathVariable Long id) {
             Usuario usuario = usuarioService.getUsuarioByID(id);
             if (usuario == null) {
@@ -62,7 +62,7 @@ public class UsuarioController {
         
         // Por email:
         @GetMapping("/email/{email}")
-        @Operation(summary = "Obtener usuario por email", description = "Retorna los detalles de un usuario buscando por email")
+        @Operation(summary = "Obtener usuario por email", description = "Retorna los detalles de un usuario buscando por email. Acceso: requiere autenticación (cualquier usuario autenticado).")
         public ResponseEntity<?> getUsuarioByEmail(@PathVariable String email) {
             Usuario usuario = usuarioService.getUsuarioByEmail(email);
             if (usuario == null) {
@@ -74,7 +74,7 @@ public class UsuarioController {
     
     // Actualizar usuario:
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario (nombre, email, contraseña, rol)")
+    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario (nombre, email, contraseña, rol). Acceso: requiere autenticación (cualquier usuario autenticado). Nota: cambiar el rol requiere rol ADMIN.")
     public ResponseEntity<?> updateUsuario(@PathVariable Long id, @Valid @RequestBody UpdateUsuarioRequest request) {
         try {
             Usuario usuario = usuarioService.getUsuarioByID(id);
@@ -156,7 +156,7 @@ public class UsuarioController {
     
     // Eliminar Usuario:
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar usuario", description = "Elimina un usuario del sistema")
+    @Operation(summary = "Eliminar usuario", description = "Elimina un usuario del sistema. Acceso: requiere autenticación (cualquier usuario autenticado).")
     public ResponseEntity<?> deleteUsuario(@PathVariable Long id) {
         Boolean deleted = usuarioService.deleteUsuarioById(id);
         if (deleted) {
@@ -175,7 +175,7 @@ public class UsuarioController {
      */
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear múltiples usuarios", description = "Crea varios usuarios en una sola solicitud")
+    @Operation(summary = "Crear múltiples usuarios", description = "Crea varios usuarios en una sola solicitud. Acceso: requiere rol ADMIN.")
     public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateBulkUsuarioRequest> requests) {
         List<Usuario> usuarios = requests.stream().map(request -> {
             Usuario usuario = new Usuario();

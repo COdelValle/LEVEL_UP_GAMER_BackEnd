@@ -43,8 +43,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/blog")
 @Tag(name = "Blog", description = "API para gestión de contenido del blog. GET es público, POST/PUT/DELETE requiere autenticación. Incluye artículos, categorías y búsqueda.")
-@SecurityRequirement(name = "bearerAuth")
-@SecurityRequirement(name = "apiKeyAuth")
 public class BlogController {
 
     @Autowired
@@ -70,7 +68,7 @@ public class BlogController {
     @Operation(
             summary = "Obtener todos los artículos",
             description = "Retorna una lista completa de todos los artículos publicados en el blog. " +
-                    "Incluye resumen, autor, categoría y metadatos de cada artículo.",
+                    "Incluye resumen, autor, categoría y metadatos de cada artículo. Acceso: Público.",
             tags = {"Blog"}
     )
     @ApiResponse(
@@ -109,7 +107,7 @@ public class BlogController {
     @Operation(
             summary = "Obtener artículo por ID",
             description = "Retorna el contenido completo de un artículo específico del blog. " +
-                    "Incluye todos los detalles, autor, categoría e información de lectura.",
+                    "Incluye todos los detalles, autor, categoría e información de lectura. Acceso: Público.",
             tags = {"Blog"}
     )
     @ApiResponse(
@@ -151,7 +149,7 @@ public class BlogController {
     @Operation(
             summary = "Obtener artículos por autor",
             description = "Retorna todos los artículos publicados por un autor específico. " +
-                    "Útil para explorar el trabajo de expertos en gaming.",
+                    "Útil para explorar el trabajo de expertos en gaming. Acceso: Público.",
             tags = {"Blog"}
     )
     @ApiResponse(
@@ -197,11 +195,13 @@ public class BlogController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
             summary = "Crear nuevo artículo",
             description = "Crea un nuevo artículo en el blog. Solo administradores y editores pueden " +
                     "realizar esta operación. El artículo se publica inmediatamente.",
-            tags = {"Blog", "Administración"}
+            tags = {"Blog"}
     )
     @ApiResponse(
             responseCode = "201",
@@ -246,10 +246,12 @@ public class BlogController {
      */
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
             summary = "Crear múltiples artículos",
             description = "Crea varios artículos en el blog en una sola solicitud",
-            tags = {"Blog", "Administración"}
+            tags = {"Blog"}
     )
     @ApiResponse(
             responseCode = "201",
@@ -302,11 +304,13 @@ public class BlogController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
             summary = "Actualizar artículo",
             description = "Actualiza los detalles de un artículo existente. Solo administradores " +
                     "y editores pueden realizar esta operación.",
-            tags = {"Blog", "Administración"}
+            tags = {"Blog"}
     )
     @ApiResponse(
             responseCode = "200",
@@ -360,11 +364,13 @@ public class BlogController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
             summary = "Eliminar artículo",
             description = "Elimina un artículo del blog. Esta operación solo puede ser realizada " +
                     "por administradores. El artículo se elimina permanentemente.",
-            tags = {"Blog", "Administración"}
+            tags = {"Blog"}
     )
     @ApiResponse(
             responseCode = "200",
@@ -415,7 +421,7 @@ public class BlogController {
     @Operation(
             summary = "Obtener artículos destacados",
             description = "Retorna los artículos marcados como destacados para mostrar " +
-                    "en la portada del blog.",
+                    "en la portada del blog. Acceso: Público.",
             tags = {"Blog"}
     )
     @ApiResponse(
