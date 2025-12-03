@@ -95,6 +95,11 @@ public class ProductoController {
         producto.setImagen(request.getImagen());
         producto.setDestacado(request.getDestacado() != null ? request.getDestacado() : false);
         producto.setNuevo(request.getNuevo() != null ? request.getNuevo() : false);
+        producto.setOferta(request.getOferta() != null ? request.getOferta() : false);
+        producto.setPrecioOferta(request.getPrecioOferta());
+        if (request.getEspecificaciones() != null) {
+            producto.setEspecificaciones(request.getEspecificaciones().toString());
+        }
         
         Producto productoGuardado = productoService.saveProducto(producto);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapearAResponse(productoGuardado));
@@ -121,6 +126,11 @@ public class ProductoController {
             producto.setImagen(request.getImagen());
             producto.setDestacado(request.getDestacado() != null ? request.getDestacado() : false);
             producto.setNuevo(request.getNuevo() != null ? request.getNuevo() : false);
+            producto.setOferta(request.getOferta() != null ? request.getOferta() : false);
+            producto.setPrecioOferta(request.getPrecioOferta());
+            if (request.getEspecificaciones() != null) {
+                producto.setEspecificaciones(request.getEspecificaciones().toString());
+            }
             return producto;
         }).collect(Collectors.toList());
 
@@ -209,6 +219,7 @@ public class ProductoController {
         response.setNuevo(producto.getNuevo());
         response.setOferta(producto.getOferta());
         response.setPrecioOferta(producto.getPrecioOferta());
+        response.setEspecificaciones(producto.getEspecificaciones());
         return response;
     }
 }

@@ -1,6 +1,7 @@
 package com.level_up_gamer.BackEnd.Service.Producto;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,48 @@ public class ProductoService {
 
     // Guardar múltiples productos:
     public List<Producto> saveAllProductos(List<Producto> productos){
-        return repository.saveAll(productos);
+        // Evitar violaciones de clave única por nombre:
+        // - Si existe un producto en BD con el mismo nombre, lo actualizamos.
+        // - Si la lista de entrada contiene duplicados por nombre, los fusionamos en un único objeto.
+        Map<String, Producto> pendientes = new java.util.LinkedHashMap<>();
+        for (Producto p : productos) {
+            String nombre = p.getNombre() != null ? p.getNombre().trim() : null;
+            if (nombre == null) continue;
+
+            if (pendientes.containsKey(nombre)) {
+                // fusionar campos no nulos/útiles del nuevo objeto en el existente
+                Producto existente = pendientes.get(nombre);
+                mergeProductoFields(existente, p);
+                pendientes.put(nombre, existente);
+            } else {
+                // comprobar si ya existe en la BD
+                Producto existInDb = repository.findByNombre(nombre).orElse(null);
+                if (existInDb != null) {
+                    mergeProductoFields(existInDb, p);
+                    pendientes.put(nombre, existInDb);
+                } else {
+                    // nuevo producto, asegurarse de limpiar id en caso de venir seteo
+                    p.setId(null);
+                    pendientes.put(nombre, p);
+                }
+            }
+        }
+
+        List<Producto> listaAGuardar = new java.util.ArrayList<>(pendientes.values());
+        return repository.saveAll(listaAGuardar);
+    }
+
+    private void mergeProductoFields(Producto target, Producto src) {
+        if (src.getPrecio() != null) target.setPrecio(src.getPrecio());
+        if (src.getCategoria() != null) target.setCategoria(src.getCategoria());
+        if (src.getDescripcion() != null) target.setDescripcion(src.getDescripcion());
+        if (src.getImagen() != null) target.setImagen(src.getImagen());
+        if (src.getStock() != null) target.setStock(src.getStock());
+        if (src.getDestacado() != null) target.setDestacado(src.getDestacado());
+        if (src.getNuevo() != null) target.setNuevo(src.getNuevo());
+        if (src.getOferta() != null) target.setOferta(src.getOferta());
+        if (src.getPrecioOferta() != null) target.setPrecioOferta(src.getPrecioOferta());
+        if (src.getEspecificaciones() != null) target.setEspecificaciones(src.getEspecificaciones());
     }
 
     // Eliminar Producto:

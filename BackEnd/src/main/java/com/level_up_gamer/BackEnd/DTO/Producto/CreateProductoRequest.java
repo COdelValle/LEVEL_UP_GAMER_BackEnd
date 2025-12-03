@@ -1,6 +1,7 @@
 package com.level_up_gamer.BackEnd.DTO.Producto;
 
 import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -56,6 +57,6 @@ public class CreateProductoRequest {
     @Schema(description = "Precio durante la oferta (solo si oferta=true)", example = "380000")
     private Integer precioOferta;
     
-    @Schema(description = "Especificaciones técnicas en formato JSON", example = "{\"RAM\":\"16GB\",\"Almacenamiento\":\"1TB SSD\"}")
-    private String especificaciones;
+    @Schema(description = "Especificaciones técnicas en formato JSON. Puede ser un objeto JSON.", example = "{\"RAM\":\"16GB\",\"Almacenamiento\":\"1TB SSD\"}")
+    private JsonNode especificaciones;
 }
