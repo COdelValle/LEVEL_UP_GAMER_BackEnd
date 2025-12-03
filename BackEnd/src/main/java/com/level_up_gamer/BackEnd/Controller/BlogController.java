@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/v1/blog")
-@Tag(name = "Blog", description = "API para gestión de contenido del blog. Incluye artículos, categorías y búsqueda.")
+@Tag(name = "Blog", description = "API para gestión de contenido del blog. GET es público, POST/PUT/DELETE requiere autenticación. Incluye artículos, categorías y búsqueda.")
 @SecurityRequirement(name = "bearerAuth")
 @SecurityRequirement(name = "apiKeyAuth")
 public class BlogController {

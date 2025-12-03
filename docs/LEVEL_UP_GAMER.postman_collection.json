@@ -239,12 +239,7 @@
           "name": "Obtener todos los productos",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "http://localhost:8080/api/v1/productos",
               "protocol": "http",
@@ -252,7 +247,7 @@
               "port": "8080",
               "path": ["api", "v1", "productos"]
             },
-            "description": "Obtiene la lista de todos los productos disponibles.\n\n**Requiere:** Autenticación"
+            "description": "Obtiene la lista de todos los productos disponibles.\n\n**Requiere:** Sin autenticación (público)"
           },
           "response": []
         },
@@ -260,12 +255,7 @@
           "name": "Obtener producto por ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "http://localhost:8080/api/v1/productos/1",
               "protocol": "http",
@@ -273,7 +263,7 @@
               "port": "8080",
               "path": ["api", "v1", "productos", "1"]
             },
-            "description": "Obtiene los detalles de un producto específico.\n\nCambia el 1 por el ID del producto."
+            "description": "Obtiene los detalles de un producto específico.\n\nCambia el 1 por el ID del producto.\n\n**Requiere:** Sin autenticación (público)"
           },
           "response": []
         },
@@ -419,7 +409,7 @@
               "port": "8080",
               "path": ["api", "v1", "blog", "1"]
             },
-            "description": "Obtiene el contenido completo de un artículo específico.\n\nCambia el 1 por el ID del artículo."
+            "description": "Obtiene el contenido completo de un artículo específico.\n\nCambia el 1 por el ID del artículo.\n\n**Requiere:** Sin autenticación (público)"
           },
           "response": []
         },
@@ -435,7 +425,7 @@
               "port": "8080",
               "path": ["api", "v1", "blog", "autor", "Level-Up Gamer Team"]
             },
-            "description": "Obtiene todos los artículos publicados por un autor específico.\n\nCambia 'Level-Up Gamer Team' por el nombre del autor."
+            "description": "Obtiene todos los artículos publicados por un autor específico.\n\nCambia 'Level-Up Gamer Team' por el nombre del autor.\n\n**Requiere:** Sin autenticación (público)"
           },
           "response": []
         },
@@ -617,10 +607,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -636,7 +622,7 @@
               "port": "8080",
               "path": ["api", "v1", "ordenes"]
             },
-            "description": "Crea una nueva orden de compra.\n\n**Requiere:** Autenticación (cualquier usuario autenticado)\n\n**Nota:** Solo debes enviar `productoId` y `cantidad` en los items. El servidor obtiene el precio del producto automáticamente."
+            "description": "Crea una nueva orden de compra.\n\n**Requiere:** Sin autenticación (público)\n\n**Nota:** Solo debes enviar `productoId` y `cantidad` en los items. El servidor obtiene el precio del producto automáticamente."
           },
           "response": []
         },

@@ -14,6 +14,8 @@ Una API RESTful para la plataforma LEVEL_UP_GAMER: gestión de usuarios, product
   - [Estructura principal del proyecto](#estructura-principal-del-proyecto)
     - [Stack principal (detalles)](#stack-principal-detalles)
   - [Primeros pasos (ejecutar localmente)](#primeros-pasos-ejecutar-localmente)
+
+  - [Endpoints públicos](#endpoints-publicos)
   - [Autenticación rápida](#autenticación-rápida)
   - [Colección Postman](#colección-postman)
   - [Tutorial para Frontend](#tutorial-para-frontend)
@@ -21,6 +23,22 @@ Una API RESTful para la plataforma LEVEL_UP_GAMER: gestión de usuarios, product
   - [Usar API Key](#usar-api-key)
   - [Tecnologías y dependencias principales](#tecnologías-y-dependencias-principales)
   - [Notas sobre Java](#notas-sobre-java)
+## Endpoints públicos
+
+Los siguientes endpoints son públicos y no requieren autenticación:
+
+- `GET /api/v1/productos` — Listar productos
+- `GET /api/v1/productos/{id}` — Ver detalle de producto
+- `GET /api/v1/blog` — Listar artículos del blog
+- `GET /api/v1/blog/{id}` — Ver detalle de artículo
+- `GET /api/v1/blog/destacados` — Artículos destacados
+- `GET /api/v1/blog/autor/{autor}` — Artículos por autor
+- `POST /api/v1/auth/register` — Registro de usuario
+- `POST /api/v1/auth/login` — Login de usuario
+
+ - `POST /api/v1/ordenes` — Crear orden de compra
+
+El resto de los endpoints requieren autenticación JWT o API Key según corresponda.
 
 ## Stack principal
 - **Java 21** (configurado en `pom.xml`)

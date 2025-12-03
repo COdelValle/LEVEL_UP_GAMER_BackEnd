@@ -91,12 +91,12 @@ public class OrdenController {
     }
 
     /**
-     * Crea una nueva orden de compra
-     * Acceso: Solo usuarios autenticados
+     * Crea una nueva orden
+     * Acceso: Público (no requiere autenticación)
+     * Nota: Se recomienda que clientes autenticados proporcionen su usuarioId o será asignado automáticamente desde el token
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SELLER')")
-    @Operation(summary = "Crear nueva orden", description = "Crea una nueva orden de compra")
+    @Operation(summary = "Crear nueva orden", description = "Crea una nueva orden de compra. Este endpoint es público y permite compras sin autenticación. Opcionalmente, proporciona usuarioId para asociar la orden a un usuario registrado.")
     @ApiResponse(responseCode = "201", description = "Orden creada exitosamente")
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos")

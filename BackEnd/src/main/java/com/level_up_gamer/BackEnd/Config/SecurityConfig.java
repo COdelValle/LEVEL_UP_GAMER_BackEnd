@@ -32,17 +32,29 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers(
-                    "/swagger-ui.html",
-                    "/swagger-ui/**",
-                    "/v1/api-docs/**",
-                    "/api-docs/**",
-                    "/docs",
-                    "/docs/**"
-                ).permitAll()
-                .requestMatchers("/api/v1/usuarios/bulk").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                    // Endpoints públicos de autenticación
+                    .requestMatchers("/api/v1/auth/**").permitAll()
+                    // Documentación y Swagger
+                    .requestMatchers(
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v1/api-docs/**",
+                        "/api-docs/**",
+                        "/docs",
+                        "/docs/**"
+                    ).permitAll()
+                    // Productos: GET público (listar y ver por ID), POST requiere autenticación
+                    .requestMatchers("GET", "/api/v1/productos").permitAll()
+                    .requestMatchers("GET", "/api/v1/productos/**").permitAll()
+                    // Blog: GET público (listar, ver por ID, destacados, por autor), POST requiere autenticación
+                    .requestMatchers("GET", "/api/v1/blog").permitAll()
+                    .requestMatchers("GET", "/api/v1/blog/**").permitAll()
+                    // Órdenes: POST público para crear compras
+                    .requestMatchers("POST", "/api/v1/ordenes").permitAll()
+                    // Usuarios: bulk creation requiere ADMIN
+                    .requestMatchers("POST", "/api/v1/usuarios/bulk").hasRole("ADMIN")
+                    // El resto requiere autenticación
+                    .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

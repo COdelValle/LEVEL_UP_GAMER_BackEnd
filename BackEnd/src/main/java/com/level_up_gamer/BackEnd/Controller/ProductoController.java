@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/v1/productos")
-@Tag(name = "Productos", description = "API para gestión del catálogo de productos")
+@Tag(name = "Productos", description = "API para gestión del catálogo de productos. GET es público, POST/PUT/DELETE requiere autenticación.")
 @SecurityRequirement(name = "bearerAuth")
 @SecurityRequirement(name = "apiKeyAuth")
 public class ProductoController {
@@ -40,9 +40,10 @@ public class ProductoController {
 
     /**
      * Obtiene todos los productos disponibles
+     * Acceso: Público (no requiere autenticación)
      */
     @GetMapping
-    @Operation(summary = "Obtener todos los productos", description = "Retorna una lista de todos los productos")
+    @Operation(summary = "Obtener todos los productos", description = "Retorna una lista de todos los productos. Este endpoint es público y no requiere autenticación.")
     @ApiResponse(responseCode = "200", description = "Lista de productos obtenida exitosamente")
     public ResponseEntity<?> obtenerTodos() {
         List<Producto> productos = productoService.getProductos();
@@ -55,9 +56,10 @@ public class ProductoController {
 
     /**
      * Obtiene un producto específico por su ID
+     * Acceso: Público (no requiere autenticación)
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener producto por ID", description = "Retorna los detalles de un producto específico")
+    @Operation(summary = "Obtener producto por ID", description = "Retorna los detalles de un producto específico. Este endpoint es público y no requiere autenticación.")
     @ApiResponse(responseCode = "200", description = "Producto encontrado")
     @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     public ResponseEntity<?> obtenerPorId(
