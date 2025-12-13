@@ -497,20 +497,20 @@ public class InfoEnvio {
 ## BLOG/ARTICULO
 
 ### Descripción
-Entidad que representa artículos del blog. Incluye contenido HTML, metadatos y estadísticas.
+Entidad que representa artículos del blog. Incluye contenido HTML, metadatos y estadísticas de interacción. Soporta incremento público de vistas y likes sin requerer autenticación.
 
-### Estructura JSON
+### Estructura JSON (BlogResponse)
 ```json
 {
   "id": 1,
   "title": "Cómo Armar el Setup Gamer Perfecto en 2025",
   "excerpt": "Descubre los componentes esenciales para crear tu estación de juego ideal...",
   "content": "<h2>La Guía Definitiva para tu Setup Gaming</h2><p>En 2025...</p>",
-  "category": "guias",
+  "categoria": "GUIAS",
   "author": "Level-Up Gamer Team",
-  "date": "2025-01-15",
+  "fecha": "2025-01-15",
   "readTime": "15 min lectura",
-  "image": "🎮",
+  "image": "https://...",
   "gradient": "from-blue-600 to-purple-600",
   "featured": true,
   "likes": 124,
@@ -520,46 +520,67 @@ Entidad que representa artículos del blog. Incluye contenido HTML, metadatos y 
 ```
 
 ### Campos
-| Campo | Tipo | Descripción | Requerido |
-|-------|------|-------------|-----------|
-| `id` | Long | Identificador único del artículo | ✅ |
-| `title` | String | Título del artículo | ✅ |
-| `excerpt` | String | Resumen corto del artículo | ✅ |
-| `content` | Text | Contenido HTML del artículo | ✅ |
-| `category` | String | Categoría (guias, reviews, noticias, tutoriales) | ✅ |
-| `author` | String | Autor del artículo | ✅ |
-| `date` | LocalDate | Fecha de publicación | ✅ |
-| `readTime` | String | Tiempo estimado de lectura | ❌ |
-| `image` | String | Emoji o URL de imagen | ❌ |
-| `gradient` | String | Clases de gradiente Tailwind | ❌ |
-| `featured` | Boolean | Si aparece en destacados | ✅ |
-| `likes` | Integer | Cantidad de likes/favoritos | ❌ |
-| `tags` | List\<String\> | Tags de clasificación | ❌ |
-| `views` | Integer | Cantidad de visualizaciones | ❌ |
+| Campo | Tipo | Descripción | Requerido | Actualizable públicamente |
+|-------|------|-------------|-----------|--------------------------|
+| `id` | Long | Identificador único del artículo | ✅ | ❌ |
+| `title` | String | Título del artículo | ✅ | ✅ (ADMIN) |
+| `excerpt` | String | Resumen corto del artículo | ✅ | ✅ (ADMIN) |
+| `content` | Text | Contenido HTML del artículo | ✅ | ✅ (ADMIN) |
+| `categoria` | Enum | Categoría (GUIAS, REVIEWS, NOTICIAS, TUTORIALES) | ✅ | ✅ (ADMIN) |
+| `author` | String | Autor del artículo | ✅ | ✅ (ADMIN) |
+| `fecha` | LocalDate | Fecha de publicación (se asigna al crear) | ✅ | ❌ |
+| `readTime` | String | Tiempo estimado de lectura | ❌ | ✅ (ADMIN) |
+| `image` | String | URL de imagen de portada | ❌ | ✅ (ADMIN) |
+| `gradient` | String | Clases de gradiente Tailwind | ❌ | ✅ (ADMIN) |
+| `featured` | Boolean | Si aparece en destacados | ✅ | ❌ |
+| `likes` | Integer | Cantidad de likes (incrementable públicamente) | ✅ | ✅ (público: POST /blog/{id}/like, /unlike) |
+| `tags` | List<String> | Tags de clasificación | ❌ | ❌ |
+| `views` | Integer | Cantidad de visualizaciones (incrementable públicamente) | ✅ | ✅ (público: POST /blog/{id}/views) |
+
+### Endpoints para Blog
+- `GET /api/v1/blog` — Listar todos los artículos
+- `GET /api/v1/blog/{id}` — Obtener artículo por ID
+- `GET /api/v1/blog/destacados` — Obtener artículos destacados
+- `GET /api/v1/blog/autor/{autor}` — Obtener artículos por autor
+- `POST /api/v1/blog/{id}/views` — **Incrementar vistas en 1** (público, sin autenticación)
+- `POST /api/v1/blog/{id}/like` — **Incrementar likes en 1** (público, sin autenticación)
+- `POST /api/v1/blog/{id}/unlike` — **Decrementar likes en 1** (público, sin autenticación; no va por debajo de 0)
+- `POST /api/v1/blog` — Crear artículo (requiere rol `ADMIN`)
+- `POST /api/v1/blog/bulk` — Crear múltiples artículos (requiere rol `ADMIN`)
+- `PUT /api/v1/blog/{id}` — Actualizar artículo (requiere rol `ADMIN`)
+- `DELETE /api/v1/blog/{id}` — Eliminar artículo (requiere rol `ADMIN`)
 
 ### Categorías de Blog
-- `guias` - Guías y tutoriales
-- `reviews` - Reseñas de productos/juegos
-- `noticias` - Noticias de la industria
-- `tutoriales` - Tutoriales paso a paso
+- `GUIAS` - Guías y tutoriales
+- `REVIEWS` - Reseñas de productos/juegos
+- `NOTICIAS` - Noticias de la industria
+- `TUTORIALES` - Tutoriales paso a paso
 
 ### Clase Java Equivalente
 ```java
 @Entity
-@Table(name = "articulos_blog")
-public class ArticuloBlog {
+@Table(name = "blog")
+public class Blog {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(nullable = false)
+    @NotBlank(message = "El título es requerido")
+    @Size(min = 10, max = 200, message = "El título debe tener entre 10 y 200 caracteres")
     private String title;
     
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Lob
+    @Column(nullable = false, columnDefinition = "CLOB")
+    @NotBlank(message = "El resumen (excerpt) es requerido")
+    @Size(min = 50, max = 500, message = "El resumen debe tener entre 50 y 500 caracteres")
     private String excerpt;
     
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Lob
+    @Column(nullable = false, columnDefinition = "CLOB")
+    @NotBlank(message = "El contenido es requerido")
+    @Size(min = 100, message = "El contenido debe tener al menos 100 caracteres")
     private String content;
     
     @Column(nullable = false)
@@ -567,9 +588,11 @@ public class ArticuloBlog {
     private CategoriaBlog categoria;
     
     @Column(nullable = false)
+    @NotBlank(message = "El autor es requerido")
     private String author;
     
     @Column(nullable = false)
+    @NotNull(message = "La fecha es requerida")
     private LocalDate fecha;
     
     @Column(nullable = true)
@@ -600,6 +623,88 @@ public class ArticuloBlog {
 public enum CategoriaBlog {
     GUIAS,
     REVIEWS,
+    NOTICIAS,
+    TUTORIALES
+}
+```
+
+### DTO de Respuesta (BlogResponse)
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Schema(description = "Información detallada de un artículo de blog")
+public class BlogResponse {
+    
+    @Schema(description = "ID único del artículo", example = "1")
+    private Long id;
+    
+    @Schema(description = "Título del artículo")
+    private String title;
+    
+    @Schema(description = "Resumen del artículo")
+    private String excerpt;
+    
+    @Schema(description = "Contenido completo del artículo")
+    private String content;
+    
+    @Schema(description = "Categoría del artículo")
+    private String categoria;
+    
+    @Schema(description = "Autor del artículo")
+    private String author;
+    
+    @Schema(description = "Fecha de publicación")
+    private LocalDate fecha;
+    
+    @Schema(description = "Tiempo estimado de lectura")
+    private String readTime;
+    
+    @Schema(description = "URL de la imagen de portada")
+    private String image;
+    
+    @Schema(description = "Código de gradiente para tema visual")
+    private String gradient;
+    
+    @Schema(description = "Si el artículo está marcado como destacado")
+    private Boolean featured;
+    
+    @Schema(description = "Cantidad de likes del artículo", example = "0")
+    private Integer likes;
+    
+    @Schema(description = "Etiquetas asociadas al artículo")
+    private List<String> tags;
+    
+    @Schema(description = "Cantidad de vistas del artículo", example = "0")
+    private Integer views;
+    
+    // Getters y Setters...
+}
+```
+
+### Servicio de Blog
+```java
+@Service
+public class BlogService {
+    @Autowired
+    private BlogRepository repository;
+
+    public List<Blog> getBlogs() { /* ... */ }
+    public Blog getBlogByID(Long id) { /* ... */ }
+    public List<Blog> getBlogByNombre(String autor) { /* ... */ }
+    
+    public Blog saveBlog(Blog o) { /* ... */ }
+    public List<Blog> saveAllBlogs(List<Blog> blogs) { /* ... */ }
+    
+    public Boolean deleteBlog(Blog o) { /* ... */ }
+    public Boolean deleteBlogById(Long id) { /* ... */ }
+    
+    // Métodos para interacción pública
+    public Blog incrementViews(Long id) { /* incrementa views en +1 */ }
+    public Blog incrementLikes(Long id) { /* incrementa likes en +1 */ }
+    public Blog decrementLikes(Long id) { /* decrementa likes en -1 (min 0) */ }
+}
+```
     NOTICIAS,
     TUTORIALES
 }
@@ -687,6 +792,19 @@ Entidad que representa las regiones y comunas de Chile para el envío de órdene
 | `nombre` | String | Nombre completo de la región | ✅ |
 | `comunas` | List\<String\> | Lista de comunas en la región | ✅ |
 
+### Endpoints para Región
+- `GET /api/v1/regiones` — Listar todas las regiones (público)
+- `GET /api/v1/regiones/{id}` — Obtener región por ID (público)
+- `GET /api/v1/regiones/{id}/comunas` — Obtener comunas de una región (público)
+- `GET /api/v1/regiones/comunas` — Obtener todas las comunas del catálogo (público)
+- `GET /api/v1/regiones/search?city={city}` — Buscar región por ciudad (público)
+- `GET /api/v1/regiones/validate?regionId={id}&comuna={comuna}` — Validar si una comuna pertenece a una región (público)
+- `GET /api/v1/regiones/validate-city?city={city}` — Validar existencia de ciudad (público)
+- `POST /api/v1/regiones` — Crear región (requiere rol `ADMIN`)
+- `POST /api/v1/regiones/bulk` — Crear múltiples regiones (requiere rol `ADMIN`)
+- `PUT /api/v1/regiones/{id}` — Actualizar región (requiere rol `ADMIN`)
+- `DELETE /api/v1/regiones/{id}` — Eliminar región (requiere rol `ADMIN`)
+
 ### Regiones disponibles
 1. `arica` - Región de Arica y Parinacota
 2. `tarapaca` - Región de Tarapacá
@@ -708,8 +826,8 @@ Entidad que representa las regiones y comunas de Chile para el envío de órdene
 ### Clase Java Equivalente
 ```java
 @Entity
-@Table(name = "regiones")
-public class Region {
+@Table(name = "region")
+public class RegionEntity {
     
     @Id
     private String id;

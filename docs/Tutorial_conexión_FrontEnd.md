@@ -124,39 +124,70 @@ Explicación paso a paso:
 Resumen de controladores y requisitos de seguridad
 
 - `AuthController` (`/api/v1/auth`)
-  - `POST /register`, `POST /login`, `POST /validate` — públicos. Devuelven `token` y `apiKey`.
+  - `POST /register`, `POST /login` — públicos. Devuelven `token` y `apiKey` (generada automáticamente).
 
 - `BlogController` (`/api/v1/blog`)
-  - `GET /`, `GET /destacados`, `GET /autor/{autor}`, `GET /{id}` — público.
-  - `POST /` — requiere `ADMIN` (en código: `hasAnyRole('ADMIN')`).
-  - `POST /bulk`, `PUT /{id}`, `DELETE /{id}` — `ADMIN`.
+  - `GET /`, `GET /{id}`, `GET /destacados`, `GET /autor/{autor}` — público.
+  - `POST /{id}/views`, `POST /{id}/like`, `POST /{id}/unlike` — **público sin autenticación** (incrementa vistas/likes).
+  - `POST /`, `POST /bulk`, `PUT /{id}`, `DELETE /{id}` — requiere `ADMIN`.
+
+- `CategoriaProductoController` (`/api/v1/categorias`)
+  - `GET /`, `GET /{id}` — público.
+  - `POST /`, `POST /bulk`, `PUT /{id}`, `DELETE /{id}` — requiere `ADMIN`.
+
+- `RegionController` (`/api/v1/regiones`)
+  - `GET /`, `GET /{id}`, `GET /{id}/comunas`, `GET /comunas`, `GET /search`, `GET /validate`, `GET /validate-city` — público.
+  - `POST /`, `POST /bulk`, `PUT /{id}`, `DELETE /{id}` — requiere `ADMIN`.
 
 - `ProductoController` (`/api/v1/productos`)
-  - `GET /`, `GET /{id}` — requieren autenticación por la configuración global.
-  - `POST /`, `PUT /{id}` — `ADMIN` o `SELLER`.
-  - `POST /bulk`, `DELETE /{id}` — `ADMIN`.
+  - `GET /`, `GET /{id}` — público.
+  - `POST /`, `POST /bulk`, `PUT /{id}`, `DELETE /{id}` — requiere autenticación.
 
 - `OrdenController` (`/api/v1/ordenes`)
-  - `GET /`, `GET /{id}` — autenticados.
-  - `POST /` — `USER`, `ADMIN` o `SELLER`.
-  - `POST /bulk`, `PUT /{id}`, `DELETE /{id}` — `ADMIN`.
+  - `POST /` — público.
+  - `GET /`, `GET /{id}` — requiere `SELLER` o `ADMIN`.
 
 - `UsuarioController` (`/api/v1/usuarios`)
-  - `GET` (todos), `GET /{id}`, `GET /email/{email}` — autenticados.
-  - `PUT /{id}` — autenticado; cambio de campo `rol` está restringido en runtime a `ROLE_ADMIN`.
+  - `GET /`, `GET /{id}`, `GET /email/{email}` — requiere autenticación.
+  - `PUT /{id}` — autenticado; cambio de rol requiere `ADMIN`.
   - `DELETE /{id}` — autenticado.
-  - `POST /bulk` — `ADMIN` (anotación `@PreAuthorize('hasRole("ADMIN")')`).
-
-Notas rápidas para el frontend
-- Para endpoints públicos no se requiere token.
-- Para llamadas protegidas usar `Authorization: Bearer {token}`; como alternativa `X-API-Key: {apiKey}` para integraciones servidor→servidor.
-- `401` = no autenticado (token inválido/expirado). `403` = autenticado pero rol insuficiente.
+  - `POST /bulk` — requiere `ADMIN` (genera `apiKey` automáticamente para cada usuario).
+  - `POST /` — requiere `ADMIN` (crea usuario personalizado, genera `apiKey` automáticamente sin solicitar token).
 
 Ejemplo: crear usuarios en masa (ADMIN)
 ```javascript
 const api = createAPI();
-await api.login('admin@local','adminpass');
-await api.post('/api/v1/usuarios/bulk', [{nombre:'A',email:'a@x',password:'123456',rol:'USER'}]);
+await api.login('admin@example.com', 'adminpass');
+// Crear múltiples usuarios con apiKey generada automáticamente
+await api.post('/api/v1/usuarios/bulk', [
+  { nombre: 'Juan García', email: 'juan@example.com', password: '123456', rol: 'USER' },
+  { nombre: 'María López', email: 'maria@example.com', password: '123456', rol: 'SELLER' }
+]);
+```
+
+Ejemplo: incrementar vistas/likes en blog (público, sin autenticación)
+```javascript
+const api = createAPI();
+// Incrementar vistas del artículo con ID 1
+await api.post('/api/v1/blog/1/views');
+
+// Agregar like al artículo
+await api.post('/api/v1/blog/1/like');
+
+// Quitar like
+await api.post('/api/v1/blog/1/unlike');
+```
+
+Ejemplo: buscar región por ciudad (público, sin autenticación)
+```javascript
+const api = createAPI();
+// Buscar región que contiene la ciudad "Santiago"
+const region = await api.get('/api/v1/regiones/search', { params: { city: 'Santiago' } });
+console.log(region);
+
+// Validar si una ciudad existe
+const isValid = await api.get('/api/v1/regiones/validate-city', { params: { city: 'Valparaíso' } });
+console.log(isValid); // { city: 'Valparaíso', valid: true }
 ```
 
 Recomendaciones de seguridad (rápido)
