@@ -46,13 +46,29 @@ public class SecurityConfig {
                     // Productos: GET público (listar y ver por ID), POST requiere autenticación
                     .requestMatchers("GET", "/api/v1/productos").permitAll()
                     .requestMatchers("GET", "/api/v1/productos/**").permitAll()
+                    // Categorías: GET público (listar y ver por ID), POST/PUT/DELETE requiere ADMIN
+                    .requestMatchers("GET", "/api/v1/categorias").permitAll()
+                    .requestMatchers("GET", "/api/v1/categorias/**").permitAll()
+                    .requestMatchers("POST", "/api/v1/categorias").hasRole("ADMIN")
+                    .requestMatchers("POST", "/api/v1/categorias/bulk").hasRole("ADMIN")
+                    .requestMatchers("PUT", "/api/v1/categorias/**").hasRole("ADMIN")
+                    .requestMatchers("DELETE", "/api/v1/categorias/**").hasRole("ADMIN")
+                    // Regiones: GET público, POST/PUT/DELETE requiere ADMIN
+                    .requestMatchers("GET", "/api/v1/regiones").permitAll()
+                    .requestMatchers("GET", "/api/v1/regiones/**").permitAll()
+                    .requestMatchers("POST", "/api/v1/regiones").hasRole("ADMIN")
+                    .requestMatchers("PUT", "/api/v1/regiones/**").hasRole("ADMIN")
+                    .requestMatchers("DELETE", "/api/v1/regiones/**").hasRole("ADMIN")
                     // Blog: GET público (listar, ver por ID, destacados, por autor), POST requiere autenticación
                     .requestMatchers("GET", "/api/v1/blog").permitAll()
                     .requestMatchers("GET", "/api/v1/blog/**").permitAll()
-                    // Órdenes: POST público para crear compras
+                    // Órdenes: POST público para crear compras, GET requiere SELLER o ADMIN
                     .requestMatchers("POST", "/api/v1/ordenes").permitAll()
-                    // Usuarios: bulk creation requiere ADMIN
+                    .requestMatchers("GET", "/api/v1/ordenes").hasAnyRole("SELLER", "ADMIN")
+                    .requestMatchers("GET", "/api/v1/ordenes/**").hasAnyRole("SELLER", "ADMIN")
+                    // Usuarios: bulk creation requiere ADMIN, custom user creation sin token/apikey requiere ADMIN
                     .requestMatchers("POST", "/api/v1/usuarios/bulk").hasRole("ADMIN")
+                    .requestMatchers("POST", "/api/v1/usuarios").hasRole("ADMIN")
                     // El resto requiere autenticación
                     .anyRequest().authenticated()
             )

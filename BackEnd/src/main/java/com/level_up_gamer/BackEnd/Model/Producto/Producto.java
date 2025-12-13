@@ -25,9 +25,10 @@ public class Producto {
     @Min(value = 0, message = "El precio debe ser mayor o igual a 0")
     private Integer precio;
     
-    @Column(nullable = false)
-    @NotBlank(message = "La categoría es requerida")
-    private String categoria;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    @NotNull(message = "La categoría es requerida")
+    private CategoriaProducto categoria;
     
     @Lob
     @Column(nullable = false, columnDefinition = "CLOB")

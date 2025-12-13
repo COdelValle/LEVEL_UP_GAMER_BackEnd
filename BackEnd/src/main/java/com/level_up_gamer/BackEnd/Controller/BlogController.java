@@ -105,24 +105,24 @@ public class BlogController {
      */
     @GetMapping("/{id}")
     @Operation(
-            summary = "Obtener artículo por ID",
-            description = "Retorna el contenido completo de un artículo específico del blog. " +
-                    "Incluye todos los detalles, autor, categoría e información de lectura. Acceso: Público.",
-            tags = {"Blog"}
+        summary = "Obtener artículo por ID",
+        description = "Retorna el contenido completo de un artículo específico del blog. " +
+                "Incluye todos los detalles, autor, categoría e información de lectura. Acceso: Público.",
+        tags = {"Blog"}
     )
     @ApiResponse(
-            responseCode = "200",
-            description = "Artículo encontrado",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
+        responseCode = "200",
+        description = "Artículo encontrado",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
     )
     @ApiResponse(
-            responseCode = "404",
-            description = "Artículo no encontrado",
-            content = @Content(mediaType = "application/json")
+        responseCode = "404",
+        description = "Artículo no encontrado",
+        content = @Content(mediaType = "application/json")
     )
     public ResponseEntity<?> obtenerPorId(
-            @Parameter(description = "ID único del artículo", required = true, example = "1")
-            @PathVariable Long id) {
+        @Parameter(description = "ID único del artículo", required = true, example = "1")
+        @PathVariable Long id) {
         
         Blog blog = blogService.getBlogByID(id);
         if (blog == null) {
@@ -147,22 +147,22 @@ public class BlogController {
      */
     @GetMapping("/autor/{autor}")
     @Operation(
-            summary = "Obtener artículos por autor",
-            description = "Retorna todos los artículos publicados por un autor específico. " +
-                    "Útil para explorar el trabajo de expertos en gaming. Acceso: Público.",
-            tags = {"Blog"}
+        summary = "Obtener artículos por autor",
+        description = "Retorna todos los artículos publicados por un autor específico. " +
+                "Útil para explorar el trabajo de expertos en gaming. Acceso: Público.",
+        tags = {"Blog"}
     )
     @ApiResponse(
-            responseCode = "200",
-            description = "Artículos del autor obtenidos exitosamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
-            )
+        responseCode = "200",
+        description = "Artículos del autor obtenidos exitosamente",
+        content = @Content(
+                mediaType = "application/json",
+                array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
+        )
     )
     public ResponseEntity<?> obtenerPorAutor(
-            @Parameter(description = "Nombre del autor a filtrar", required = true, example = "Juan García")
-            @PathVariable String autor) {
+        @Parameter(description = "Nombre del autor a filtrar", required = true, example = "Juan García")
+        @PathVariable String autor) {
         
         List<Blog> blogs = blogService.getBlogByNombre(autor);
         List<BlogResponse> response = blogs.stream()
@@ -198,30 +198,30 @@ public class BlogController {
     @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
-            summary = "Crear nuevo artículo",
-            description = "Crea un nuevo artículo en el blog. Solo administradores y editores pueden " +
-                    "realizar esta operación. El artículo se publica inmediatamente.",
-            tags = {"Blog"}
+        summary = "Crear nuevo artículo",
+        description = "Crea un nuevo artículo en el blog. Solo administradores y editores pueden " +
+                "realizar esta operación. El artículo se publica inmediatamente.",
+        tags = {"Blog"}
     )
     @ApiResponse(
-            responseCode = "201",
-            description = "Artículo creado exitosamente",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
+        responseCode = "201",
+        description = "Artículo creado exitosamente",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
     )
     @ApiResponse(
-            responseCode = "400",
-            description = "Datos de entrada inválidos",
-            content = @Content(mediaType = "application/json")
+        responseCode = "400",
+        description = "Datos de entrada inválidos",
+        content = @Content(mediaType = "application/json")
     )
     @ApiResponse(
-            responseCode = "401",
-            description = "No autenticado",
-            content = @Content(mediaType = "application/json")
+        responseCode = "401",
+        description = "No autenticado",
+        content = @Content(mediaType = "application/json")
     )
     @ApiResponse(
-            responseCode = "403",
-            description = "Usuario no tiene permiso para crear artículos",
-            content = @Content(mediaType = "application/json")
+        responseCode = "403",
+        description = "Usuario no tiene permiso para crear artículos",
+        content = @Content(mediaType = "application/json")
     )
     public ResponseEntity<?> crear(
             @Valid @RequestBody CreateBlogRequest request) {
@@ -249,17 +249,17 @@ public class BlogController {
     @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
-            summary = "Crear múltiples artículos",
-            description = "Crea varios artículos en el blog en una sola solicitud",
-            tags = {"Blog"}
+        summary = "Crear múltiples artículos",
+        description = "Crea varios artículos en el blog en una sola solicitud",
+        tags = {"Blog"}
     )
     @ApiResponse(
-            responseCode = "201",
-            description = "Artículos creados exitosamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
-            )
+        responseCode = "201",
+        description = "Artículos creados exitosamente",
+        content = @Content(
+                mediaType = "application/json",
+                array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
+        )
     )
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
@@ -307,25 +307,25 @@ public class BlogController {
     @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
-            summary = "Actualizar artículo",
-            description = "Actualiza los detalles de un artículo existente. Solo administradores " +
-                    "y editores pueden realizar esta operación.",
-            tags = {"Blog"}
+        summary = "Actualizar artículo",
+        description = "Actualiza los detalles de un artículo existente. Solo administradores " +
+                "y editores pueden realizar esta operación.",
+        tags = {"Blog"}
     )
     @ApiResponse(
-            responseCode = "200",
-            description = "Artículo actualizado exitosamente",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
+        responseCode = "200",
+        description = "Artículo actualizado exitosamente",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
     )
     @ApiResponse(
-            responseCode = "404",
-            description = "Artículo no encontrado",
-            content = @Content(mediaType = "application/json")
+        responseCode = "404",
+        description = "Artículo no encontrado",
+        content = @Content(mediaType = "application/json")
     )
     @ApiResponse(
-            responseCode = "403",
-            description = "Usuario no tiene permiso",
-            content = @Content(mediaType = "application/json")
+        responseCode = "403",
+        description = "Usuario no tiene permiso",
+        content = @Content(mediaType = "application/json")
     )
     public ResponseEntity<?> actualizar(
             @Parameter(description = "ID del artículo a actualizar", required = true, example = "1")
@@ -367,29 +367,29 @@ public class BlogController {
     @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
-            summary = "Eliminar artículo",
-            description = "Elimina un artículo del blog. Esta operación solo puede ser realizada " +
-                    "por administradores. El artículo se elimina permanentemente.",
-            tags = {"Blog"}
+        summary = "Eliminar artículo",
+        description = "Elimina un artículo del blog. Esta operación solo puede ser realizada " +
+                "por administradores. El artículo se elimina permanentemente.",
+        tags = {"Blog"}
     )
     @ApiResponse(
-            responseCode = "200",
-            description = "Artículo eliminado exitosamente",
-            content = @Content(mediaType = "application/json")
+        responseCode = "200",
+        description = "Artículo eliminado exitosamente",
+        content = @Content(mediaType = "application/json")
     )
     @ApiResponse(
-            responseCode = "404",
-            description = "Artículo no encontrado",
-            content = @Content(mediaType = "application/json")
+        responseCode = "404",
+        description = "Artículo no encontrado",
+        content = @Content(mediaType = "application/json")
     )
     @ApiResponse(
-            responseCode = "403",
-            description = "Usuario no tiene permiso (solo ADMIN)",
-            content = @Content(mediaType = "application/json")
+        responseCode = "403",
+        description = "Usuario no tiene permiso (solo ADMIN)",
+        content = @Content(mediaType = "application/json")
     )
     public ResponseEntity<?> eliminar(
-            @Parameter(description = "ID del artículo a eliminar", required = true, example = "1")
-            @PathVariable Long id) {
+        @Parameter(description = "ID del artículo a eliminar", required = true, example = "1")
+        @PathVariable Long id) {
         
         Blog blog = blogService.getBlogByID(id);
         if (blog == null) {

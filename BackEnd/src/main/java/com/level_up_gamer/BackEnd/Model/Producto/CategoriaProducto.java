@@ -1,8 +1,5 @@
 package com.level_up_gamer.BackEnd.Model.Producto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,7 +25,4 @@ public class CategoriaProducto {
     
     @Column(nullable = true)
     private String icono;
-    
-    @OneToMany(mappedBy = "categoria")
-    private List<Producto> productos = new ArrayList<>();
 }

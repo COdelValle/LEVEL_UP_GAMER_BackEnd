@@ -3,6 +3,8 @@ package com.level_up_gamer.BackEnd.Controller;
 import com.level_up_gamer.BackEnd.DTO.Producto.CreateProductoRequest;
 import com.level_up_gamer.BackEnd.DTO.Producto.ProductoResponse;
 import com.level_up_gamer.BackEnd.Model.Producto.Producto;
+import com.level_up_gamer.BackEnd.Model.Producto.CategoriaProducto;
+import com.level_up_gamer.BackEnd.Service.Producto.CategoriaProductoService;
 import com.level_up_gamer.BackEnd.Service.Producto.ProductoService;
 import com.level_up_gamer.BackEnd.Exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +39,9 @@ public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
-
+    
+    @Autowired
+    private CategoriaProductoService categoriaService;
     /**
      * Obtiene todos los productos disponibles
      * Acceso: Público (no requiere autenticación)
@@ -79,8 +83,8 @@ public class ProductoController {
      * Acceso: Solo ADMIN y SELLER
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
-    @Operation(summary = "Crear nuevo producto", description = "Crea un nuevo producto. Acceso: requiere rol ADMIN o SELLER.")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Operation(summary = "Crear nuevo producto", description = "Crea un nuevo producto. Acceso: requiere rol ADMIN.")
     @ApiResponse(responseCode = "201", description = "Producto creado exitosamente")
     @ApiResponse(responseCode = "400", description = "Datos inválidos")
     @ApiResponse(responseCode = "403", description = "No tiene permisos")
@@ -89,7 +93,9 @@ public class ProductoController {
         Producto producto = new Producto();
         producto.setNombre(request.getNombre());
         producto.setPrecio(request.getPrecio());
-        producto.setCategoria(request.getCategoria());
+        CategoriaProducto categoria = categoriaService.getCategoriaProductoByID(request.getCategoriaId());
+        if (categoria == null) throw new ResourceNotFoundException("Categoria con ID " + request.getCategoriaId() + " no encontrada");
+        producto.setCategoria(categoria);
         producto.setStock(request.getStock());
         producto.setDescripcion(request.getDescripcion());
         producto.setImagen(request.getImagen());
@@ -120,7 +126,9 @@ public class ProductoController {
             Producto producto = new Producto();
             producto.setNombre(request.getNombre());
             producto.setPrecio(request.getPrecio());
-            producto.setCategoria(request.getCategoria());
+            CategoriaProducto c = categoriaService.getCategoriaProductoByID(request.getCategoriaId());
+            if (c == null) throw new ResourceNotFoundException("Categoria con ID " + request.getCategoriaId() + " no encontrada");
+            producto.setCategoria(c);
             producto.setStock(request.getStock());
             producto.setDescripcion(request.getDescripcion());
             producto.setImagen(request.getImagen());
@@ -164,7 +172,9 @@ public class ProductoController {
         
         producto.setNombre(request.getNombre());
         producto.setPrecio(request.getPrecio());
-        producto.setCategoria(request.getCategoria());
+        CategoriaProducto cat = categoriaService.getCategoriaProductoByID(request.getCategoriaId());
+        if (cat == null) throw new ResourceNotFoundException("Categoria con ID " + request.getCategoriaId() + " no encontrada");
+        producto.setCategoria(cat);
         producto.setStock(request.getStock());
         producto.setDescripcion(request.getDescripcion());
         producto.setImagen(request.getImagen());
@@ -211,7 +221,8 @@ public class ProductoController {
         response.setId(producto.getId());
         response.setNombre(producto.getNombre());
         response.setPrecio(producto.getPrecio());
-        response.setCategoria(producto.getCategoria());
+        response.setCategoriaId(producto.getCategoria() != null ? producto.getCategoria().getId() : null);
+        response.setCategoriaNombre(producto.getCategoria() != null ? producto.getCategoria().getNombre() : null);
         response.setDescripcion(producto.getDescripcion());
         response.setStock(producto.getStock());
         response.setImagen(producto.getImagen());

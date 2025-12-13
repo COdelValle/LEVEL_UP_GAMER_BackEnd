@@ -1,4 +1,4 @@
-package com.level_up_gamer.BackEnd.Model;
+package com.level_up_gamer.BackEnd.Model.Region;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "region")
-public class Region {
+public class RegionEntity {
     
     @Id
     @NotBlank(message = "El id de la región es requerido")

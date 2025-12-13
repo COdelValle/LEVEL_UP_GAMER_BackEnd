@@ -198,6 +198,60 @@ public class UsuarioController {
         
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    /**
+     * Crea un usuario personalizado sin token y apikey
+     * Acceso: Solo ADMIN
+     */
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Crear usuario personalizado", description = "Crea un usuario con datos personalizados, sin generar token ni apikey automáticamente. Acceso: requiere rol ADMIN.")
+    public ResponseEntity<?> crearUsuarioPersonalizado(@Valid @RequestBody CreateCustomUsuarioRequest request) {
+        try {
+            // Validar email único
+            if (usuarioService.getUsuarioByEmail(request.getEmail()) != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ErrorResponse("El email ya está registrado"));
+            }
+
+            // Validar RUT único si se proporciona
+            if (request.getRut() != null && !request.getRut().isEmpty()) {
+                if (usuarioService.getUsuarioByRut(request.getRut()) != null) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new ErrorResponse("El RUT ya está registrado"));
+                }
+            }
+
+            // Validar contraseña
+            if (request.getPassword() == null || request.getPassword().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(new ErrorResponse("La contraseña es requerida"));
+            }
+
+            if (request.getPassword().length() < 6) {
+                return ResponseEntity.badRequest()
+                    .body(new ErrorResponse("La contraseña debe tener al menos 6 caracteres"));
+            }
+
+            Usuario usuario = new Usuario();
+            usuario.setNombre(request.getNombre());
+            usuario.setEmail(request.getEmail());
+            usuario.setRut(request.getRut());
+            usuario.setPassword(usuarioService.encryptPassword(request.getPassword()));
+            usuario.setRol(RolUsuario.valueOf(request.getRol() != null ? request.getRol().toUpperCase() : "USER"));
+            usuario.setFechaCreacion(LocalDateTime.now());
+
+            Usuario usuarioGuardado = usuarioService.saveUsuario(usuario);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", "Usuario creado exitosamente");
+            response.put("usuario", usuarioGuardado);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
     
     // Clase interna para manejar errores:
     public static class ErrorResponse {
@@ -237,6 +291,32 @@ public class UsuarioController {
 
         public String getApiKey() { return apiKey; }
         public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+
+        public String getRol() { return rol; }
+        public void setRol(String rol) { this.rol = rol; }
+    }
+
+    /**
+     * DTO para crear usuario personalizado (sin token y apikey)
+     */
+    public static class CreateCustomUsuarioRequest {
+        private String nombre;
+        private String email;
+        private String rut;
+        private String password;
+        private String rol = "USER";
+
+        public String getNombre() { return nombre; }
+        public void setNombre(String nombre) { this.nombre = nombre; }
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+
+        public String getRut() { return rut; }
+        public void setRut(String rut) { this.rut = rut; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
 
         public String getRol() { return rol; }
         public void setRol(String rol) { this.rol = rol; }

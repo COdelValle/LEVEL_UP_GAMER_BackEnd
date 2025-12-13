@@ -34,8 +34,11 @@ public class ProductoResponse {
     @Schema(description = "Precio regular en pesos", example = "450000")
     private Integer precio;
     
-    @Schema(description = "Categoría del producto", example = "Gaming")
-    private String categoria;
+    @Schema(description = "ID de la categoría del producto", example = "1")
+    private Long categoriaId;
+
+    @Schema(description = "Nombre de la categoría", example = "Gaming")
+    private String categoriaNombre;
     
     @Schema(description = "URL de la imagen", example = "https://cdn.example.com/gpu/4080.jpg")
     private String imagen;

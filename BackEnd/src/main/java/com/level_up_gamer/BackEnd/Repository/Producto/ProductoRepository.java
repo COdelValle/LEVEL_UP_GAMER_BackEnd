@@ -13,7 +13,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Long>{
     Optional<Producto> findByNombre(String nombre);
     boolean existsByNombre(String nombre);
     void deleteByNombre(String nombre);
-    List<Producto> findByCategoria(String categoria);
+    // Buscar por nombre de la categoría relacionada (ej: "Gaming").
+    List<Producto> findByCategoriaNombre(String nombre);
     List<Producto> findByOfertaTrue();
     List<Producto> findByDestacadoTrue();
 }

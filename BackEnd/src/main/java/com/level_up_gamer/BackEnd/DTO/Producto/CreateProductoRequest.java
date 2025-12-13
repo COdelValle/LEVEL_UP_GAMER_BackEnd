@@ -27,9 +27,9 @@ public class CreateProductoRequest {
     @Schema(description = "Precio en pesos (sin decimales)", example = "450000")
     private Integer precio;
     
-    @NotBlank(message = "La categoría es requerida")
-    @Schema(description = "Categoría del producto", example = "Gaming")
-    private String categoria;
+    @NotNull(message = "La categoría (id) es requerida")
+    @Schema(description = "ID de la categoría del producto", example = "1")
+    private Long categoriaId;
     
     @NotBlank(message = "La imagen es requerida")
     @Schema(description = "URL de la imagen del producto", example = "https://cdn.example.com/gpu/4080.jpg")
