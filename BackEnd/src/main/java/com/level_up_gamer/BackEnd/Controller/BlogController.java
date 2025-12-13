@@ -199,7 +199,7 @@ public class BlogController {
     @SecurityRequirement(name = "apiKeyAuth")
     @Operation(
         summary = "Crear nuevo artículo",
-        description = "Crea un nuevo artículo en el blog. Solo administradores y editores pueden " +
+        description = "Crea un nuevo artículo en el blog. Solo administradores pueden " +
                 "realizar esta operación. El artículo se publica inmediatamente.",
         tags = {"Blog"}
     )
@@ -233,6 +233,7 @@ public class BlogController {
         blog.setCategoria(CategoriaBlog.valueOf(request.getCategoria().toUpperCase()));
         blog.setAuthor(request.getAuthor());
         blog.setFecha(java.time.LocalDate.now());
+        blog.setReadTime(request.getReadTime());
         blog.setImage(request.getImage());
         blog.setGradient(request.getGradient());
         
@@ -272,6 +273,7 @@ public class BlogController {
             blog.setCategoria(CategoriaBlog.valueOf(request.getCategoria().toUpperCase()));
             blog.setAuthor(request.getAuthor());
             blog.setFecha(java.time.LocalDate.now());
+            blog.setReadTime(request.getReadTime());
             blog.setImage(request.getImage());
             blog.setGradient(request.getGradient());
             return blog;

@@ -22,7 +22,7 @@ public class CreateOrdenRequest {
     private List<OrdenItemRequest> items;
     
     @NotNull(message = "El método de pago es requerido")
-    @Schema(description = "Método de pago (Tarjeta, PayPal, Transferencia)", example = "Tarjeta")
+    @Schema(description = "Método de pago (Tarjeta_Credito, Tarjeta_Debito, PayPal, Transferencia)", example = "Tarjeta")
     private String metodoPago;
     
     @NotBlank(message = "El nombre de envío es requerido")

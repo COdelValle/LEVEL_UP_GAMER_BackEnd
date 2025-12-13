@@ -5,6 +5,7 @@ import com.level_up_gamer.BackEnd.Service.Producto.CategoriaProductoService;
 import com.level_up_gamer.BackEnd.Exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,10 @@ public class CategoriaProductoController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar categoría", description = "Actualiza una categoría existente. Requiere rol ADMIN.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categoría actualizada"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
+    })
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody CategoriaProducto request) {
         CategoriaProducto existing = categoriaService.getCategoriaProductoByID(id);
         if (existing == null) throw new ResourceNotFoundException("Categoria con ID " + id + " no encontrada");
@@ -84,6 +89,10 @@ public class CategoriaProductoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar categoría", description = "Elimina una categoría. Requiere rol ADMIN.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categoría eliminada"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
+    })
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         CategoriaProducto existing = categoriaService.getCategoriaProductoByID(id);
         if (existing == null) throw new ResourceNotFoundException("Categoria con ID " + id + " no encontrada");

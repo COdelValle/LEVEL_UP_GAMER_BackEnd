@@ -61,6 +61,10 @@ public class UsuarioService {
         return passwordEncrypter.encryptPassword(password);
     }
 
+    // Generar API Key (expuesta para que controladores la usen cuando creen usuarios)
+    public String generateApiKey() {
+        return passwordEncrypter.generateApiKey();
+    }
     // Eliminar Usuario:
         // Por Objeto:
         public Boolean deleteUsuario(Usuario o){

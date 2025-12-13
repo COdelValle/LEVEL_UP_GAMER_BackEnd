@@ -12,6 +12,8 @@ import com.level_up_gamer.BackEnd.Model.Usuario.RolUsuario;
 import com.level_up_gamer.BackEnd.DTO.Usuario.UpdateUsuarioRequest;
 import com.level_up_gamer.BackEnd.Service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -176,6 +178,10 @@ public class UsuarioController {
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear múltiples usuarios", description = "Crea varios usuarios en una sola solicitud. Acceso: requiere rol ADMIN.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuarios creados"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    })
     public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateBulkUsuarioRequest> requests) {
         List<Usuario> usuarios = requests.stream().map(request -> {
             Usuario usuario = new Usuario();
@@ -183,7 +189,7 @@ public class UsuarioController {
             usuario.setEmail(request.getEmail());
             usuario.setRut(request.getRut());
             usuario.setPassword(usuarioService.encryptPassword(request.getPassword()));
-            usuario.setApiKey(request.getApiKey());
+            usuario.setApiKey(usuarioService.generateApiKey());
             usuario.setRol(RolUsuario.valueOf(request.getRol().toUpperCase()));
             usuario.setFechaCreacion(LocalDateTime.now());
             return usuario;
@@ -205,7 +211,12 @@ public class UsuarioController {
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear usuario personalizado", description = "Crea un usuario con datos personalizados, sin generar token ni apikey automáticamente. Acceso: requiere rol ADMIN.")
+    @Operation(summary = "Crear usuario personalizado", description = "Crea un usuario con datos personalizados; el sistema generará automáticamente la apiKey. Acceso: requiere rol ADMIN.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos o error en la creación"),
+        @ApiResponse(responseCode = "409", description = "Email o RUT ya registrado")
+    })
     public ResponseEntity<?> crearUsuarioPersonalizado(@Valid @RequestBody CreateCustomUsuarioRequest request) {
         try {
             // Validar email único
@@ -239,6 +250,8 @@ public class UsuarioController {
             usuario.setRut(request.getRut());
             usuario.setPassword(usuarioService.encryptPassword(request.getPassword()));
             usuario.setRol(RolUsuario.valueOf(request.getRol() != null ? request.getRol().toUpperCase() : "USER"));
+            // Generar apiKey automáticamente como en el flujo de registro
+            usuario.setApiKey(usuarioService.generateApiKey());
             usuario.setFechaCreacion(LocalDateTime.now());
 
             Usuario usuarioGuardado = usuarioService.saveUsuario(usuario);
@@ -274,7 +287,6 @@ public class UsuarioController {
         private String email;
         private String rut;
         private String password;
-        private String apiKey;
         private String rol = "USER";
 
         public String getNombre() { return nombre; }
@@ -288,9 +300,6 @@ public class UsuarioController {
 
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
-
-        public String getApiKey() { return apiKey; }
-        public void setApiKey(String apiKey) { this.apiKey = apiKey; }
 
         public String getRol() { return rol; }
         public void setRol(String rol) { this.rol = rol; }
