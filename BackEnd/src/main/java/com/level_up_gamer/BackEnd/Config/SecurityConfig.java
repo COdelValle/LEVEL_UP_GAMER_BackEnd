@@ -60,8 +60,12 @@ public class SecurityConfig {
                     .requestMatchers("PUT", "/api/v1/regiones/**").hasRole("ADMIN")
                     .requestMatchers("DELETE", "/api/v1/regiones/**").hasRole("ADMIN")
                     // Blog: GET público (listar, ver por ID, destacados, por autor), POST requiere autenticación
+                    // Views y likes son públicos (POST /{id}/views, POST /{id}/like, POST /{id}/unlike)
                     .requestMatchers("GET", "/api/v1/blog").permitAll()
                     .requestMatchers("GET", "/api/v1/blog/**").permitAll()
+                    .requestMatchers("POST", "/api/v1/blog/*/views").permitAll()
+                    .requestMatchers("POST", "/api/v1/blog/*/like").permitAll()
+                    .requestMatchers("POST", "/api/v1/blog/*/unlike").permitAll()
                     // Órdenes: POST público para crear compras, GET requiere SELLER o ADMIN
                     .requestMatchers("POST", "/api/v1/ordenes").permitAll()
                     .requestMatchers("GET", "/api/v1/ordenes").hasAnyRole("SELLER", "ADMIN")

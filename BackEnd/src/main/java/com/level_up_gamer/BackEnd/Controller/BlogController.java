@@ -444,6 +444,42 @@ public class BlogController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/views")
+    @Operation(summary = "Incrementar vistas", description = "Incrementa el contador de vistas del artículo en 1. Público.")
+    @ApiResponse(responseCode = "200", description = "Vistas incrementadas")
+    @ApiResponse(responseCode = "404", description = "Artículo no encontrado")
+    public ResponseEntity<?> incrementarVistas(@PathVariable Long id) {
+        Blog b = blogService.incrementViews(id);
+        if (b == null) throw new ResourceNotFoundException("Artículo con ID " + id + " no encontrado");
+        return ResponseEntity.ok(mapearAResponse(b));
+    }
+
+    @PostMapping("/{id}/like")
+    @Operation(summary = "Agregar like", description = "Incrementa el contador de likes del artículo en 1. Público.")
+    @ApiResponse(responseCode = "200", description = "Like agregado")
+    @ApiResponse(responseCode = "404", description = "Artículo no encontrado")
+    public ResponseEntity<?> agregarLike(@PathVariable Long id) {
+        Blog b = blogService.incrementLikes(id);
+        if (b == null) throw new ResourceNotFoundException("Artículo con ID " + id + " no encontrado");
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("id", b.getId());
+        resp.put("likes", b.getLikes());
+        return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping("/{id}/unlike")
+    @Operation(summary = "Quitar like", description = "Disminuye el contador de likes del artículo en 1 (no menor a 0). Público.")
+    @ApiResponse(responseCode = "200", description = "Like removido")
+    @ApiResponse(responseCode = "404", description = "Artículo no encontrado")
+    public ResponseEntity<?> quitarLike(@PathVariable Long id) {
+        Blog b = blogService.decrementLikes(id);
+        if (b == null) throw new ResourceNotFoundException("Artículo con ID " + id + " no encontrado");
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("id", b.getId());
+        resp.put("likes", b.getLikes());
+        return ResponseEntity.ok(resp);
+    }
+
     /**
      * Mapea una entidad Blog a su DTO de respuesta
      * 
@@ -456,12 +492,16 @@ public class BlogController {
         response.setTitle(blog.getTitle());
         response.setExcerpt(blog.getExcerpt());
         response.setContent(blog.getContent());
-        response.setCategoria(blog.getCategoria().toString());
+        response.setCategoria(blog.getCategoria() != null ? blog.getCategoria().toString() : null);
         response.setAuthor(blog.getAuthor());
         response.setFecha(blog.getFecha());
         response.setReadTime(blog.getReadTime());
         response.setImage(blog.getImage());
         response.setGradient(blog.getGradient());
+        response.setFeatured(blog.getFeatured());
+        response.setLikes(blog.getLikes() == null ? 0 : blog.getLikes());
+        response.setTags(blog.getTags());
+        response.setViews(blog.getViews() == null ? 0 : blog.getViews());
         return response;
     }
 }

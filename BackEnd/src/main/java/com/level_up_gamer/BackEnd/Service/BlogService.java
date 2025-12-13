@@ -51,4 +51,38 @@ public class BlogService {
             repository.deleteById(id);
             return !repository.existsById(id);
         }
+
+    // Incrementar vistas en +1 y devolver el blog actualizado
+    public Blog incrementViews(Long id) {
+        Blog b = getBlogByID(id);
+        if (b == null) return null;
+        Integer v = b.getViews();
+        if (v == null) v = 0;
+        b.setViews(v + 1);
+        return repository.save(b);
+    }
+
+    // Incrementar likes en +1
+    public Blog incrementLikes(Long id) {
+        Blog b = getBlogByID(id);
+        if (b == null) return null;
+        Integer l = b.getLikes();
+        if (l == null) l = 0;
+        b.setLikes(l + 1);
+        return repository.save(b);
+    }
+
+    // Decrementar likes en -1 (no menor a 0)
+    public Blog decrementLikes(Long id) {
+        Blog b = getBlogByID(id);
+        if (b == null) return null;
+        Integer l = b.getLikes();
+        if (l == null || l <= 0) {
+            b.setLikes(0);
+        } else {
+            b.setLikes(l - 1);
+        }
+        return repository.save(b);
+    }
 }
+

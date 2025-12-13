@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * DTO para respuesta de artículo de blog
@@ -45,4 +46,16 @@ public class BlogResponse {
     
     @Schema(description = "Código de gradiente para tema visual")
     private String gradient;
+    
+    @Schema(description = "Si el artículo está marcado como destacado")
+    private Boolean featured;
+    
+    @Schema(description = "Cantidad de likes del artículo", example = "0")
+    private Integer likes;
+    
+    @Schema(description = "Etiquetas asociadas al artículo")
+    private List<String> tags;
+    
+    @Schema(description = "Cantidad de vistas del artículo", example = "0")
+    private Integer views;
 }
