@@ -66,12 +66,27 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
-                    description = "Usuario registrado exitosamente",
+                    description = "Usuario registrado exitosamente. Se retorna token JWT, API Key y datos del usuario.",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Datos inválidos o email ya existe",
+                    description = "Error de validación:\n" +
+                            "- Email ya está registrado\n" +
+                            "- Nombre vacío o muy corto (mínimo 2 caracteres)\n" +
+                            "- Contraseña muy corta (mínimo 6 caracteres)\n" +
+                            "- Contraseñas no coinciden\n" +
+                            "- Email inválido o mal formado",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Error de procesamiento: datos inválidos que no pueden procesarse",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor: fallo al encriptar contraseña o generar token",
                     content = @Content(mediaType = "application/json")
             )
     })
@@ -106,17 +121,28 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Autenticación exitosa",
+                    description = "Autenticación exitosa. Se retorna JWT Token (válido 24h), API Key y datos del usuario.",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Credenciales inválidas",
+                    description = "Credenciales rechazadas:\n" +
+                            "- Email no registrado en el sistema\n" +
+                            "- Contraseña incorrecta\n" +
+                            "- Usuario inactivo o bloqueado",
                     content = @Content(mediaType = "application/json")
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Validación fallida",
+                    description = "Error de validación:\n" +
+                            "- Email vacío o inválido\n" +
+                            "- Contraseña vacía\n" +
+                            "- Formato de solicitud incorrecto",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno: fallo en validación de contraseña o generación de token",
                     content = @Content(mediaType = "application/json")
             )
     })
@@ -150,12 +176,28 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Token validado exitosamente",
+                    description = "Token validado exitosamente. Campo 'valid' será true y message contiene confirmación.",
                     content = @Content(mediaType = "application/json")
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Token inválido o expirado",
+                    description = "Token inválido o rechazado:\n" +
+                            "- Token expirado (mayor a 24 horas)\n" +
+                            "- Firma JWT corrupta o inválida\n" +
+                            "- Token malformado\n" +
+                            "- Token de usuario inexistente o eliminado",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Error en solicitud:\n" +
+                            "- Header Authorization faltante\n" +
+                            "- Formato incorrecto del header",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno: fallo al validar token en servidor",
                     content = @Content(mediaType = "application/json")
             )
     })

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -71,14 +72,20 @@ public class BlogController {
                     "Incluye resumen, autor, categoría y metadatos de cada artículo. Acceso: Público.",
             tags = {"Blog"}
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Artículos obtenidos exitosamente",
-            content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
-            )
-    )
+    @ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "200",
+                description = "Artículos obtenidos exitosamente. Retorna array con todos los artículos publicados.",
+                content = @Content(
+                        mediaType = "application/json",
+                        array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
+                )
+        ),
+        @ApiResponse(
+                responseCode = "500",
+                description = "Error interno: fallo al obtener artículos de la base de datos"
+        )
+    })
     public ResponseEntity<?> obtenerTodos() {
         List<Blog> blogs = blogService.getBlogs();
         List<BlogResponse> response = blogs.stream()
@@ -110,16 +117,26 @@ public class BlogController {
                 "Incluye todos los detalles, autor, categoría e información de lectura. Acceso: Público.",
         tags = {"Blog"}
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Artículo encontrado",
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
-    )
-    @ApiResponse(
-        responseCode = "404",
-        description = "Artículo no encontrado",
-        content = @Content(mediaType = "application/json")
-    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Artículo encontrado. Retorna objeto completo con todos los detalles.",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BlogResponse.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Artículo no encontrado. El ID proporcionado no existe en el blog.",
+            content = @Content(mediaType = "application/json")
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "ID inválido. El parámetro id debe ser un número entero válido."
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno: fallo al consultar base de datos"
+        )
+    })
     public ResponseEntity<?> obtenerPorId(
         @Parameter(description = "ID único del artículo", required = true, example = "1")
         @PathVariable Long id) {
@@ -152,14 +169,28 @@ public class BlogController {
                 "Útil para explorar el trabajo de expertos en gaming. Acceso: Público.",
         tags = {"Blog"}
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Artículos del autor obtenidos exitosamente",
-        content = @Content(
-                mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Artículos del autor obtenidos exitosamente. Retorna array con artículos coincidentes.",
+            content = @Content(
+                    mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = BlogResponse.class))
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "No hay artículos de este autor. El nombre de autor no existe o no tiene artículos publicados."
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Parámetro autor vacío o inválido."
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Error interno: fallo al buscar artículos"
         )
-    )
+    })
     public ResponseEntity<?> obtenerPorAutor(
         @Parameter(description = "Nombre del autor a filtrar", required = true, example = "Juan García")
         @PathVariable String autor) {

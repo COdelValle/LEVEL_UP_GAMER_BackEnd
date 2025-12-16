@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -61,7 +62,12 @@ public class OrdenController {
      */
     @GetMapping
     @Operation(summary = "Obtener todas las órdenes", description = "Retorna una lista de todas las órdenes. Acceso: requiere autenticación (cualquier usuario autenticado).")
-    @ApiResponse(responseCode = "200", description = "Lista de órdenes obtenida exitosamente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de órdenes obtenida exitosamente. Retorna array con todas las órdenes del sistema."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Usuario sin permisos para ver órdenes."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo en base de datos")
+    })
     public ResponseEntity<?> obtenerTodas() {
         List<Orden> ordenes = ordenService.getOrdenes();
         List<OrdenResponse> response = ordenes.stream()
@@ -76,8 +82,13 @@ public class OrdenController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Obtener orden por ID", description = "Retorna los detalles de una orden específica. Acceso: requiere autenticación (cualquier usuario autenticado).")
-    @ApiResponse(responseCode = "200", description = "Orden encontrada")
-    @ApiResponse(responseCode = "404", description = "Orden no encontrada")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Orden encontrada. Retorna objeto completo con detalles e items de la orden."),
+        @ApiResponse(responseCode = "404", description = "Orden no encontrada. El ID proporcionado no existe."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "400", description = "ID inválido. El parámetro id debe ser un número entero válido."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo en base de datos")
+    })
     public ResponseEntity<?> obtenerPorId(
             @Parameter(description = "ID único de la orden", required = true, example = "1")
             @PathVariable Long id) {
@@ -97,9 +108,14 @@ public class OrdenController {
      */
     @PostMapping
     @Operation(summary = "Crear nueva orden", description = "Crea una nueva orden de compra. Este endpoint es público y permite compras sin autenticación. Opcionalmente, proporciona usuarioId para asociar la orden a un usuario registrado.")
-    @ApiResponse(responseCode = "201", description = "Orden creada exitosamente")
-    @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Orden creada exitosamente. Retorna objeto orden con ID generado y estado PENDIENTE."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Items vacío, cantidad inválida, método de pago inválido, datos de envío incompletos"),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado. Uno o más productos en los items no existe. O usuario no encontrado si se proporciona usuarioId."),
+        @ApiResponse(responseCode = "409", description = "Stock insuficiente. Uno o más productos no tiene suficiente inventario."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida en formato de solicitud."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al crear orden en base de datos")
+    })
     public ResponseEntity<?> crear(@Valid @RequestBody CreateOrdenRequest request) {
         Orden orden = new Orden();
 
@@ -192,9 +208,16 @@ public class OrdenController {
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear múltiples órdenes", description = "Crea varias órdenes en una sola solicitud. Acceso: requiere rol ADMIN.")
-    @ApiResponse(responseCode = "201", description = "Órdenes creadas exitosamente")
-    @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Órdenes creadas exitosamente. Retorna lista de órdenes creadas."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Items vacíos, productos no encontrados, stock insuficiente, datos inválidos"),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede crear múltiples órdenes."),
+        @ApiResponse(responseCode = "404", description = "Uno o más productos no encontrados."),
+        @ApiResponse(responseCode = "409", description = "Stock insuficiente en uno o más productos."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al crear órdenes en base de datos")
+    })
     public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateOrdenRequest> requests) {
         List<Orden> ordenes = requests.stream().map(request -> {
             Orden orden = new Orden();
@@ -300,9 +323,15 @@ public class OrdenController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar orden existente", description = "Actualiza el estado de una orden. Si el estado cambia a COMPLETADO, reduce automáticamente el stock de los productos. Acceso: requiere rol ADMIN.")
-    @ApiResponse(responseCode = "200", description = "Orden actualizada exitosamente")
-    @ApiResponse(responseCode = "404", description = "Orden no encontrada")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Orden actualizada exitosamente. Retorna objeto orden con nuevo estado. Si fue completada, stock se reduce automáticamente."),
+        @ApiResponse(responseCode = "404", description = "Orden no encontrada. El ID proporcionado no existe."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Estado inválido, ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede actualizar órdenes."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al actualizar orden o reducir stock")
+    })
     public ResponseEntity<?> actualizar(
             @Parameter(description = "ID de la orden a actualizar", required = true, example = "1")
             @PathVariable Long id,
@@ -333,9 +362,14 @@ public class OrdenController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar orden", description = "Elimina una orden. Acceso: requiere rol ADMIN.")
-    @ApiResponse(responseCode = "200", description = "Orden eliminada exitosamente")
-    @ApiResponse(responseCode = "404", description = "Orden no encontrada")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Orden eliminada exitosamente. Retorna confirmación con ID eliminado."),
+        @ApiResponse(responseCode = "404", description = "Orden no encontrada. El ID proporcionado no existe."),
+        @ApiResponse(responseCode = "400", description = "ID inválido. El parámetro id debe ser un número entero válido."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede eliminar órdenes."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al eliminar orden de base de datos")
+    })
     public ResponseEntity<?> eliminar(
             @Parameter(description = "ID de la orden a eliminar", required = true, example = "1")
             @PathVariable Long id) {

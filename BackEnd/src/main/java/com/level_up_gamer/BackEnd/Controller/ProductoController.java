@@ -10,6 +10,7 @@ import com.level_up_gamer.BackEnd.Exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,7 +49,10 @@ public class ProductoController {
      */
     @GetMapping
     @Operation(summary = "Obtener todos los productos", description = "Retorna una lista de todos los productos. Este endpoint es público y no requiere autenticación.")
-    @ApiResponse(responseCode = "200", description = "Lista de productos obtenida exitosamente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de productos obtenida exitosamente. Retorna array con todos los productos del catálogo."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al obtener productos de base de datos")
+    })
     public ResponseEntity<?> obtenerTodos() {
         List<Producto> productos = productoService.getProductos();
         List<ProductoResponse> response = productos.stream()
@@ -64,8 +68,12 @@ public class ProductoController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Obtener producto por ID", description = "Retorna los detalles de un producto específico. Este endpoint es público y no requiere autenticación.")
-    @ApiResponse(responseCode = "200", description = "Producto encontrado")
-    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto encontrado. Retorna objeto completo con todos los detalles del producto."),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado. El ID proporcionado no existe en el catálogo."),
+        @ApiResponse(responseCode = "400", description = "ID inválido. El parámetro id debe ser un número entero válido."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al consultar base de datos")
+    })
     public ResponseEntity<?> obtenerPorId(
             @Parameter(description = "ID único del producto", required = true, example = "1")
             @PathVariable Long id) {
@@ -80,14 +88,20 @@ public class ProductoController {
 
     /**
      * Crea un nuevo producto en el catálogo
-     * Acceso: Solo ADMIN y SELLER
+     * Acceso: Solo ADMIN
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @Operation(summary = "Crear nuevo producto", description = "Crea un nuevo producto. Acceso: requiere rol ADMIN.")
-    @ApiResponse(responseCode = "201", description = "Producto creado exitosamente")
-    @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos")
+    @Operation(summary = "Crear nuevo producto", description = "Crea un nuevo producto en el catálogo. Acceso: requiere rol ADMIN.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Producto creado exitosamente. Retorna objeto producto con ID generado."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Nombre vacío, precio inválido, categoría no existe, stock negativo"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada. El categoriaId proporcionado no existe."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede crear productos."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al guardar producto en base de datos")
+    })
     public ResponseEntity<?> crear(@Valid @RequestBody CreateProductoRequest request) {
         
         Producto producto = new Producto();
@@ -118,9 +132,15 @@ public class ProductoController {
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear múltiples productos", description = "Crea varios productos en una sola solicitud. Acceso: requiere rol ADMIN.")
-    @ApiResponse(responseCode = "201", description = "Productos creados exitosamente")
-    @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Productos creados exitosamente. Retorna lista de productos creados."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Datos inválidos, categorías no encontradas, precios inválidos"),
+        @ApiResponse(responseCode = "404", description = "Una o más categorías no encontradas."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede crear productos en lote."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al guardar productos en base de datos")
+    })
     public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateProductoRequest> requests) {
         List<Producto> productos = requests.stream().map(request -> {
             Producto producto = new Producto();
@@ -152,14 +172,20 @@ public class ProductoController {
 
     /**
      * Actualiza un producto existente
-     * Acceso: Solo ADMIN y SELLER
+     * Acceso: Solo ADMIN
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
-    @Operation(summary = "Actualizar producto existente", description = "Actualiza los detalles de un producto. Acceso: requiere rol ADMIN o SELLER.")
-    @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente")
-    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos")
+    @Operation(summary = "Actualizar producto existente", description = "Actualiza los detalles de un producto existente. Acceso: requiere rol ADMIN o SELLER.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente. Retorna objeto producto con datos modificados."),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado. El ID proporcionado no existe. O categoría no encontrada."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Datos inválidos, precio negativo, categoría no existe, stock inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN y SELLER pueden actualizar productos."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al guardar cambios en base de datos")
+    })
     public ResponseEntity<?> actualizar(
             @Parameter(description = "ID del producto a actualizar", required = true, example = "1")
             @PathVariable Long id,
@@ -192,9 +218,14 @@ public class ProductoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar producto", description = "Elimina un producto del catálogo. Acceso: requiere rol ADMIN.")
-    @ApiResponse(responseCode = "200", description = "Producto eliminado exitosamente")
-    @ApiResponse(responseCode = "404", description = "Producto no encontrado")
-    @ApiResponse(responseCode = "403", description = "No tiene permisos (solo ADMIN)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto eliminado exitosamente. Retorna confirmación con ID del producto eliminado."),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado. El ID proporcionado no existe."),
+        @ApiResponse(responseCode = "400", description = "ID inválido. El parámetro id debe ser un número entero válido."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede eliminar productos."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al eliminar producto de base de datos")
+    })
     public ResponseEntity<?> eliminar(
             @Parameter(description = "ID del producto a eliminar", required = true, example = "1")
             @PathVariable Long id) {

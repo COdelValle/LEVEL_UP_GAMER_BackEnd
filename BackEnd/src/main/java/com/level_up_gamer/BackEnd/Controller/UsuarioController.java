@@ -45,6 +45,12 @@ public class UsuarioController {
         // Todos los Usuarios:
         @GetMapping
         @Operation(summary = "Obtener todos los usuarios", description = "Retorna una lista de todos los usuarios registrados. Acceso: requiere autenticación (cualquier usuario autenticado).")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente. Retorna array con todos los usuarios registrados."),
+            @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente en header Authorization."),
+            @ApiResponse(responseCode = "403", description = "No autorizado. Usuario sin permisos suficientes para listar usuarios."),
+            @ApiResponse(responseCode = "500", description = "Error interno: fallo en base de datos o servidor")
+        })
         public ResponseEntity<List<Usuario>> getAllUsuarios() {
             List<Usuario> usuarios = usuarioService.getUsuarios();
             return ResponseEntity.ok(usuarios);
@@ -53,6 +59,13 @@ public class UsuarioController {
         // Por ID:
         @GetMapping("/{id}")
         @Operation(summary = "Obtener usuario por ID", description = "Retorna los detalles de un usuario específico. Acceso: requiere autenticación (cualquier usuario autenticado).")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado. Retorna objeto completo con todos sus datos."),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado. El ID proporcionado no existe en el sistema."),
+            @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+            @ApiResponse(responseCode = "400", description = "ID inválido. El parámetro id debe ser un número entero válido."),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
         public ResponseEntity<?> getUsuarioById(@PathVariable Long id) {
             Usuario usuario = usuarioService.getUsuarioByID(id);
             if (usuario == null) {
@@ -65,6 +78,13 @@ public class UsuarioController {
         // Por email:
         @GetMapping("/email/{email}")
         @Operation(summary = "Obtener usuario por email", description = "Retorna los detalles de un usuario buscando por email. Acceso: requiere autenticación (cualquier usuario autenticado).")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado por email. Retorna objeto completo con todos sus datos."),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado. El email proporcionado no está registrado en el sistema."),
+            @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+            @ApiResponse(responseCode = "400", description = "Email inválido o mal formado. Verifique el formato del email."),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
         public ResponseEntity<?> getUsuarioByEmail(@PathVariable String email) {
             Usuario usuario = usuarioService.getUsuarioByEmail(email);
             if (usuario == null) {
@@ -76,7 +96,17 @@ public class UsuarioController {
     
     // Actualizar usuario:
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario (nombre, email, contraseña, rol). Acceso: requiere autenticación (cualquier usuario autenticado). Nota: cambiar el rol requiere rol ADMIN.")
+    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario (nombre, email, contraseña, rol). Acceso: requiere autenticación. Nota: cambiar el rol requiere rol ADMIN.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario actualizado exitosamente. Retorna objeto usuario con los datos modificados."),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado. El ID proporcionado no existe."),
+        @ApiResponse(responseCode = "409", description = "Conflicto. Email o RUT ya están registrados por otro usuario."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Contraseñas no coinciden, Contraseña muy corta (mín 6), Rol inválido (USER/ADMIN/SELLER/GUEST)"),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede cambiar roles. Usuario sin permisos para actualizar."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida en el formato de la solicitud."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo en base de datos o encriptación de contraseña")
+    })
     public ResponseEntity<?> updateUsuario(@PathVariable Long id, @Valid @RequestBody UpdateUsuarioRequest request) {
         try {
             Usuario usuario = usuarioService.getUsuarioByID(id);
@@ -159,6 +189,14 @@ public class UsuarioController {
     // Eliminar Usuario:
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar usuario", description = "Elimina un usuario del sistema. Acceso: requiere autenticación (cualquier usuario autenticado).")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario eliminado correctamente. Retorna confirmación con mensaje de éxito."),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado. El ID proporcionado no existe en el sistema."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Usuario sin permisos para eliminar."),
+        @ApiResponse(responseCode = "400", description = "ID inválido. El parámetro id debe ser un número entero válido."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al eliminar usuario de base de datos")
+    })
     public ResponseEntity<?> deleteUsuario(@PathVariable Long id) {
         Boolean deleted = usuarioService.deleteUsuarioById(id);
         if (deleted) {
@@ -179,8 +217,12 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear múltiples usuarios", description = "Crea varios usuarios en una sola solicitud. Acceso: requiere rol ADMIN.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Usuarios creados"),
-        @ApiResponse(responseCode = "400", description = "Datos inválidos")
+        @ApiResponse(responseCode = "201", description = "Usuarios creados exitosamente. Retorna lista con usuarios creados y cantidad total."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Datos inválidos, email duplicado, RUT duplicado, contraseña muy corta"),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede crear múltiples usuarios."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida en formato de solicitud."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo al crear usuarios en base de datos")
     })
     public ResponseEntity<?> crearMultiples(@Valid @RequestBody List<CreateBulkUsuarioRequest> requests) {
         List<Usuario> usuarios = requests.stream().map(request -> {
@@ -213,9 +255,13 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear usuario personalizado", description = "Crea un usuario con datos personalizados; el sistema generará automáticamente la apiKey. Acceso: requiere rol ADMIN.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos inválidos o error en la creación"),
-        @ApiResponse(responseCode = "409", description = "Email o RUT ya registrado")
+        @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente. Retorna objeto usuario con apiKey generada automáticamente."),
+        @ApiResponse(responseCode = "400", description = "Error de validación: Contraseña faltante, muy corta (mín 6), email vacío, datos requeridos faltantes"),
+        @ApiResponse(responseCode = "409", description = "Conflicto. Email o RUT ya están registrados en el sistema."),
+        @ApiResponse(responseCode = "401", description = "No autenticado. Token JWT inválido, expirado o ausente."),
+        @ApiResponse(responseCode = "403", description = "No autorizado. Solo ADMIN puede crear usuarios personalizados."),
+        @ApiResponse(responseCode = "422", description = "Datos no procesables. Validación fallida en formato de solicitud."),
+        @ApiResponse(responseCode = "500", description = "Error interno: fallo en encriptación o almacenamiento de usuario")
     })
     public ResponseEntity<?> crearUsuarioPersonalizado(@Valid @RequestBody CreateCustomUsuarioRequest request) {
         try {
