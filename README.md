@@ -4,7 +4,7 @@ Una API RESTful para la plataforma LEVEL_UP_GAMER: gestión de usuarios, product
 
 **Diseñado para**: desarrolladores y testers que desean ejecutar localmente el backend, probar endpoints y entender rápidamente las reglas de seguridad.
 
-**Estado:** En desarrollo / Hotfix branch activo
+**Estado:** Finalizado.
 
 ## Tabla de contenidos
 
