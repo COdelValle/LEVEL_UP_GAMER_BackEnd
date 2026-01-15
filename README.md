@@ -113,8 +113,9 @@ El resto de los endpoints requieren autenticación JWT o API Key según correspo
 
 ## Primeros pasos (ejecutar localmente)
 
-1. Abrir PowerShell en la raíz del repo (carpeta `BackEnd`).
-2. Compilar y ejecutar con Maven (wrapper incluido):
+1. Cambiar ruta de la carpeta del proyecto dentro de [application.properties](BackEnd/src/main/resources/application.properties).
+2. Abrir PowerShell en la raíz del repo (carpeta `BackEnd`).
+3. Compilar y ejecutar con Maven (wrapper incluido):
 
 ```powershell
 cd BackEnd
